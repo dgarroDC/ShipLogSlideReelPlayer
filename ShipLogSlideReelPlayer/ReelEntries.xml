@@ -1,0 +1,181 @@
+<AstroObjectEntry>
+	<ID>INVISIBLE_PLANET</ID>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_1_Story_Burned</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_1_STORY</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_1_Seal</ID>
+		<Name>Seal Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_1</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_1_LibraryPath</ID>
+		<Name>Secret Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_1_SECRET</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_2_Story_Burned</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_2_STORY</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_2_Seal</ID>
+		<Name>Seal Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_2</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_2_LibraryPath</ID>
+		<Name>Secret Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_2_SECRET</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_LanternSecret</ID>
+		<Name>Lanterns Room Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_2_LIGHTHOUSE</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_3_Story_Burned</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_3_STORY</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_3_Seal</ID>
+		<Name>Seal Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_3</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_3_LibraryPath</ID>
+		<Name>Secret Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_3_SECRET</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_ExperimentFail</ID>
+		<Name>First Experiment Vision</Name>
+		<DGARRO_PARENT>IP_ZONE_3_ENTRANCE</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_ExperimentSuccess</ID>
+		<Name>Third Experiment Vision</Name>
+		<DGARRO_PARENT>IP_ZONE_3_ENTRANCE</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_ExperimentWatch_Burned</ID>
+		<Name>Experiments Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_3_ENTRANCE</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_Burning</ID>
+		<Name>Reels Burning Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_3_LAB</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_4_Story_Burned</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_4_STORY</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_1_Story_Complete</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_1</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_1_DreamRule</ID>
+		<Name>Error Report Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_1</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_2_Story_Complete</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_2</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_2_DreamRule_v1</ID>
+		<Name>Two Artifacts Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_2</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_2_DreamRule_v2</ID>
+		<Name>Error Report Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_2</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_3_Story_Complete</ID>
+		<Name>Story Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_3</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_3_DreamRule</ID>
+		<Name>Error Report Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_3</DGARRO_PARENT>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_ExperimentWatch</ID>
+		<Name>Experiments Reel</Name>
+		<DGARRO_PARENT>IP_DREAM_LIBRARY_3</DGARRO_PARENT>
+	</Entry>
+
+	<Entry>
+		<ID>Prefab_IP_Reel_PrisonPeephole_Vision</ID>
+		<Name>Vault Vision</Name>
+		<DGARRO_PARENT>IP_PRISON</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_TowerVision</ID>
+		<Name>Tower Secret Passage Vision</Name>
+		<DGARRO_PARENT>IP_DREAM_LAKE</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_4_Story_Vision</ID>
+		<Name>Prisoner Vision</Name>
+		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_5_Story_Vision_NoInterloperNoVessel</ID>
+		<Name>My Vision</Name>
+		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_NoInterloper</DGARRO_OVERRIDEN>
+		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_NoVessel</DGARRO_OVERRIDEN>
+		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_Complete</DGARRO_OVERRIDEN>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_5_Story_Vision_NoInterloper</ID>
+		<Name>My Vision</Name>
+		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_Complete</DGARRO_OVERRIDEN>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_5_Story_Vision_NoVessel</ID>
+		<Name>My Vision</Name>
+		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_Complete</DGARRO_OVERRIDEN>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_5_Story_Vision_Complete</ID>
+		<Name>My Vision</Name>
+		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+	<Entry>
+		<ID>Prefab_IP_Reel_PrisonerFarewellVision</ID>
+		<Name>Farewell Vision</Name>
+		<DGARRO_PARENT>IP_DREAM_LAKE</DGARRO_PARENT>
+		<DGARRO_ISVISION/>
+	</Entry>
+</AstroObjectEntry>
