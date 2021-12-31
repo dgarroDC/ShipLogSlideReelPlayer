@@ -54,6 +54,11 @@
 		<DGARRO_PARENT>IP_ZONE_3_SECRET</DGARRO_PARENT>
 	</Entry>
 	<Entry>
+		<ID>Prefab_IP_Reel_DamageReport</ID>
+		<Name>Hull Breach Reel</Name>
+		<DGARRO_PARENT>IP_ZONE_3</DGARRO_PARENT>
+	</Entry>
+	<Entry>
 		<ID>Prefab_IP_Reel_ExperimentFail</ID>
 		<Name>First Experiment Vision</Name>
 		<DGARRO_PARENT>IP_ZONE_3_ENTRANCE</DGARRO_PARENT>
@@ -100,7 +105,7 @@
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_2_DreamRule_v1</ID>
-		<Name>Two Artifacts Reel</Name>
+		<Name>Dying Bearer Reel</Name>
 		<DGARRO_PARENT>IP_DREAM_LIBRARY_2</DGARRO_PARENT>
 	</Entry>
 	<Entry>
