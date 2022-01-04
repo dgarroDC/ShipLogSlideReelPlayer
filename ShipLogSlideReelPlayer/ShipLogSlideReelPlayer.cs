@@ -31,9 +31,7 @@ namespace ShipLogSlideReelPlayer
             ModHelper.HarmonyHelper.AddPrefix<ShipLogDetectiveMode>("EnterMode", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.EnterDetectiveMode));
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("Initialize", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.AddMoreEntryListItemsAndCreateProyector));
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("SetEntryFocus", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.SetEntryFocus));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("SetEntryFocus", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.RemoveReel));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.RemoveReel));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("ExitMode", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.RemoveReel));
+            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.CloseEntryMenu));
             ModHelper.HarmonyHelper.AddPostfix<SlideCollectionContainer>("SetReadFlag", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.OnSlideRead));
         }
         private void Update()
@@ -227,16 +225,73 @@ namespace ShipLogSlideReelPlayer
         }
 
         private static void SetEntryFocus(ShipLogMapMode __instance)
-        {   
-            ShipLogEntry entry = __instance._listItems[__instance._entryIndex].GetEntry();
-            if (_reelEntries.ContainsKey(entry.GetID()))
-            {
-                (entry as ReelShipLogEntry).PlaceReelOnProyector(_reelProyector);
-            }
-        }
-        private static void RemoveReel()
         {
             _reelProyector.RemoveReel();
+
+            List<string> wantedStreamingAssetIDs = new List<string>();
+            int index = __instance._entryIndex;
+            ShipLogEntry entry = __instance._listItems[index].GetEntry();
+            if (_reelEntries.ContainsKey(entry.GetID()))
+            {
+                // Loading the textures is probably only necessary in case no real entries are revealed,
+                // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
+                (entry as ReelShipLogEntry).PlaceReelOnProyector(_reelProyector);
+                (entry as ReelShipLogEntry).LoadStreamingTextures(wantedStreamingAssetIDs);
+
+            }
+            // Load textures of neighbors to avoid delay with white photo when displaying the entry,
+            // also make sure not to unload reels with streaming assets with want
+            int entryCount = __instance._maxIndex + 1;
+            if (entryCount >= 2)
+            {
+                LoadStreamingTextures(__instance, index - 1, wantedStreamingAssetIDs);
+                if (entryCount >= 3)
+                {
+                    LoadStreamingTextures(__instance, index + 1, wantedStreamingAssetIDs);
+                    if (entryCount >= 4)
+                    {
+                        UnloadStreamingTextures(__instance, index - 2, wantedStreamingAssetIDs);
+                        if (entryCount >= 5)
+                        {
+                            UnloadStreamingTextures(__instance, index + 2, wantedStreamingAssetIDs);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void CloseEntryMenu(ShipLogMapMode __instance)
+        {
+            _reelProyector.RemoveReel();
+            for (int i = 0; i <= __instance._maxIndex; i++)
+            {
+                UnloadStreamingTextures(__instance, i);
+            }
+        }
+
+        private static void LoadStreamingTextures(ShipLogMapMode mapMode, int index, List<string> wantedStreamingAssetIDs)
+        {
+            index = Mod(index, mapMode._maxIndex + 1);
+            ShipLogEntry entry = mapMode._listItems[index].GetEntry();
+            if (_reelEntries.ContainsKey(entry.GetID()))
+            {
+                (entry as ReelShipLogEntry).LoadStreamingTextures(wantedStreamingAssetIDs);
+            }
+        }
+
+        private static void UnloadStreamingTextures(ShipLogMapMode mapMode, int index, List<string> wantedStreamingAssetIDs = null)
+        {
+            index = Mod(index, mapMode._maxIndex + 1);
+            ShipLogEntry entry = mapMode._listItems[index].GetEntry();
+            if (_reelEntries.ContainsKey(entry.GetID()))
+            {
+                (entry as ReelShipLogEntry).UnloadStreamingTextures(wantedStreamingAssetIDs);
+            }
+        }
+
+        static int Mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
 
         private static void OnSlideRead(SlideCollectionContainer __instance)

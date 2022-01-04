@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipLogSlideReelPlayer
 {
@@ -30,12 +29,7 @@ namespace ShipLogSlideReelPlayer
             _isVision = isVision;
             reel.onSlideTextureUpdated += OnSlideTextureUpdated;
             reel.onPlayBeatAudio += OnPlayBeatAudio;
-            reel.Initialize();
             reel.ResetSlideIndex();
-            if (reel.streamingTexturesAvailable)
-            {
-                reel.LoadStreamingTextures();
-            }
             reel.enabled = true;
             OnSlideTextureUpdated();
             _playing = false;
@@ -48,13 +42,12 @@ namespace ShipLogSlideReelPlayer
         {
             if (IsReelPlaced()) 
             {
-                if (_reel.streamingTexturesAvailable)
-                {
-                    _reel.UnloadStreamingTextures();
-                }
                 _reel.onSlideTextureUpdated -= OnSlideTextureUpdated;
                 _reel.onPlayBeatAudio -= OnPlayBeatAudio;
                 Locator.GetSlideReelMusicManager().OnExitSlideProjector(false);
+                // This is important to make the neighbors be able to load the first slide texture of this reel
+                // (that could be unloaded at this point)
+                _reel.ResetSlideIndex();
                 _reel.enabled = false;
                 _reel = null;
                 _playing = false;
