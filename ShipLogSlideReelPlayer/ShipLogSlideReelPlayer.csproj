@@ -17,6 +17,8 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\evilshader" />
+    <None Remove="Assets\evilshader.manifest" />
     <None Remove="ReelEntries.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -32,8 +34,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\evilshader.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ShipLogSlideReelPlayer.csproj.user" />
     <Content Include="ReelEntries.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\evilshader">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

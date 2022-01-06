@@ -12,14 +12,18 @@ namespace ShipLogSlideReelPlayer
     public class ShipLogSlideReelPlayer : ModBehaviour
     {
         public static Dictionary<string, ReelShipLogEntry> _reelEntries;
-        private static ShipLogSlideProyector _reelProyector;
-        private static string _entriesFileLocation;
+        public static Shader _evilShader;
 
         public static bool _enabled;
         public static bool _showAll;
 
+        private static ShipLogSlideProyector _reelProyector;
+        private static string _entriesFileLocation;
+
         private void Start()
         {
+            AssetBundle bundle = ModHelper.Assets.LoadBundle("Assets/evilshader");
+            _evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             _entriesFileLocation = ModHelper.Manifest.ModFolderPath + "ReelEntries.xml";
             ModHelper.HarmonyHelper.AddPostfix<ShipLogManager>("Awake", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.LoadReelEntries));
             ModHelper.HarmonyHelper.AddPostfix<ShipLogManager>("GetEntriesByAstroBody", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntriesByAstroBody));

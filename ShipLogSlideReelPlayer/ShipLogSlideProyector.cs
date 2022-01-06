@@ -12,10 +12,15 @@ namespace ShipLogSlideReelPlayer
         private ScreenPrompt _forwardPrompt;
         private ScreenPrompt _reversePrompt;
         ScreenPromptList _prompList;
+        Material _originalPhotoMaterial;
+        Material _invertPhotoMaterial;
 
         public ShipLogSlideProyector(ShipLogMapMode mapMode)
         {
             _mapMode = mapMode;
+            _originalPhotoMaterial = _mapMode._photo.material;
+            _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer._evilShader);
+
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt) + "   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt) + "   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
             _prompList = mapMode._upperRightPromptList;
@@ -36,6 +41,12 @@ namespace ShipLogSlideReelPlayer
 
             _forwardPrompt.SetVisibility(true);
             _reversePrompt.SetVisibility(true);
+
+            // Texture from reels are inverted, use shader to invert it back
+            if (!_isVision)
+            {
+               _mapMode._photo.material = _invertPhotoMaterial;
+            }
         }
 
         public void RemoveReel()
@@ -54,6 +65,11 @@ namespace ShipLogSlideReelPlayer
 
                 _forwardPrompt.SetVisibility(false);
                 _reversePrompt.SetVisibility(false);
+
+                if (!_isVision)
+                {
+                    _mapMode._photo.material = _originalPhotoMaterial;
+                }
             }
         }
   
@@ -64,29 +80,6 @@ namespace ShipLogSlideReelPlayer
                 Texture2D texture = _reel.GetCurrentSlideTexture() as Texture2D;
                 if (texture != null)
                 {
-                    // Visions are the only ones not inverted
-                    if (!_isVision)
-                    {
-                        // TODO: Shader?
-                        // https://stackoverflow.com/questions/44733841/how-to-make-texture2d-readable-via-script
-                        RenderTexture renderTex = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
-                        Graphics.Blit(texture, renderTex);
-                        RenderTexture previous = RenderTexture.active;
-                        RenderTexture.active = renderTex;
-                        Texture2D invertedTexture = new Texture2D(texture.width, texture.height);
-                        invertedTexture.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
-                        RenderTexture.active = previous;
-                        RenderTexture.ReleaseTemporary(renderTex);
-
-                        Color[] pixels = invertedTexture.GetPixels();
-                        for (int i = 0; i < pixels.Length; i++)
-                        {
-                            pixels[i] = new Color(1f - pixels[i].r, 1f - pixels[i].g, 1f - pixels[i].b, pixels[i].a);
-                        }
-                        invertedTexture.SetPixels(pixels);
-                        invertedTexture.Apply();
-                        texture = invertedTexture;
-                    }
                     _mapMode._photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
                 }
             }
