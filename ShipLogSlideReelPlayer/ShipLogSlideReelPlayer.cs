@@ -273,10 +273,16 @@ namespace ShipLogSlideReelPlayer
 
         private static void CloseEntryMenu(ShipLogMapMode __instance)
         {
-            _reelProyector.RemoveReel();
-            for (int i = 0; i <= __instance._maxIndex; i++)
+            // We need to check this because some properties in ShipLogMapMode could have uninitialized values and cause errors
+            // This works because this is a prefix patch
+            // (it wouldn't work as postfix, although checking _entryIndex >= 0 would also probably do the trick)
+            if (__instance._isEntryMenuOpen)
             {
-                UnloadStreamingTextures(__instance, i);
+                _reelProyector.RemoveReel();
+                for (int i = 0; i <= __instance._maxIndex; i++)
+                {
+                    UnloadStreamingTextures(__instance, i);
+                }
             }
         }
 
