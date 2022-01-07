@@ -42,10 +42,17 @@ namespace ShipLogSlideReelPlayer
             _forwardPrompt.SetVisibility(true);
             _reversePrompt.SetVisibility(true);
 
-            // Texture from reels are inverted, use shader to invert it back
             if (!_isVision)
             {
-               _mapMode._photo.material = _invertPhotoMaterial;
+                // Texture from reels are inverted, use shader to invert it back
+                if (_mapMode._photo.material != _invertPhotoMaterial)
+                {
+                    _mapMode._photo.material = _invertPhotoMaterial;
+                }
+            }
+            else
+            {
+                RestoreOriginalMaterial();
             }
         }
 
@@ -65,11 +72,6 @@ namespace ShipLogSlideReelPlayer
 
                 _forwardPrompt.SetVisibility(false);
                 _reversePrompt.SetVisibility(false);
-
-                if (!_isVision)
-                {
-                    _mapMode._photo.material = _originalPhotoMaterial;
-                }
             }
         }
   
@@ -128,6 +130,14 @@ namespace ShipLogSlideReelPlayer
                 }
                 _reel.DecreaseSlideIndex();
                 _reel.TryPlayMusicForCurrentSlideTransition(false);
+            }
+        }
+
+        public void RestoreOriginalMaterial()
+        {
+            if (_mapMode._photo.material != _originalPhotoMaterial)
+            {
+                _mapMode._photo.material = _originalPhotoMaterial;
             }
         }
     }

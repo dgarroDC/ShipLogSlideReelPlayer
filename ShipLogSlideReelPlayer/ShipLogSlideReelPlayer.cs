@@ -241,8 +241,15 @@ namespace ShipLogSlideReelPlayer
                 // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
                 (entry as ReelShipLogEntry).PlaceReelOnProyector(_reelProyector);
                 (entry as ReelShipLogEntry).LoadStreamingTextures(wantedStreamingAssetIDs);
-
             }
+            else
+            {
+                // Don't restore the material every time we remove a reel,
+                // otherwise changing to rumor mode or map we would briefly see the inverted reel textures
+                // Placing a vision reel also restore the material in the other branch
+                _reelProyector.RestoreOriginalMaterial();
+            }
+
             // Load textures of neighbors to avoid delay with white photo when displaying the entry,
             // also make sure not to unload reels with streaming assets with want
             int entryCount = __instance._maxIndex + 1;
