@@ -62,6 +62,7 @@ namespace ShipLogSlideReelPlayer
             {
                 _reel.onSlideTextureUpdated -= OnSlideTextureUpdated;
                 _reel.onPlayBeatAudio -= OnPlayBeatAudio;
+                // Stop all audio
                 Locator.GetSlideReelMusicManager().OnExitSlideProjector(false);
                 // This is important to make the neighbors be able to load the first slide texture of this reel
                 // (that could be unloaded at this point)
@@ -93,12 +94,6 @@ namespace ShipLogSlideReelPlayer
             Locator.GetSlideReelMusicManager().PlayBeat(audioType, _isVision);
         }
 
-        //private void OnEndOfSlides()
-        //{
-        //    // Avoid excesive overlaping of music
-        //    Locator.GetSlideReelMusicManager().OnExitSlideProjector(false);
-        //}
-
         public bool IsReelPlaced()
         {
             return _reel != null;
@@ -111,10 +106,15 @@ namespace ShipLogSlideReelPlayer
                 if (!_playing)
                 {
                     _playing = true;
-                    // Force start the music, don't do this on place reel, that would be annoying
+                    // Force start the music of the first slide, don't do this on place reel, that would be annoying
+                    // This is for beats (My Vision and Farewell Vision only)
                     _reel.ForceCurrentSlideDisplayEvent(true);
-                    // Not sure if this is correct
+                    // This is for backdrops (all other visions and Hull Breach Reel only)
                     _reel.TryPlayMusicForCurrentSlideInclusive();
+                } else if (_reel.slideIndex == _reel.slideCount -1)
+                {
+                    // Avoid annoying overlap of music (My Vision and Farewall Vision)
+                    Locator.GetSlideReelMusicManager().StopAllBeatSources(0.5f);
                 }
                 _reel.IncreaseSlideIndex();
                 _reel.TryPlayMusicForCurrentSlideTransition(true);
