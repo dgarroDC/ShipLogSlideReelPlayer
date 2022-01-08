@@ -19,11 +19,9 @@ namespace ShipLogSlideReelPlayer
 
         private static ShipLogSlideProyector _reelProyector;
         private static string _entriesFileLocation;
-        public static IModConsole _console;
 
         private void Start()
         {
-            _console = ModHelper.Console;
             AssetBundle bundle = ModHelper.Assets.LoadBundle("Assets/evilshader");
             _evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             _entriesFileLocation = ModHelper.Manifest.ModFolderPath + "ReelEntries.xml";
@@ -39,23 +37,7 @@ namespace ShipLogSlideReelPlayer
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("SetEntryFocus", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.SetEntryFocus));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.CloseEntryMenu));
             ModHelper.HarmonyHelper.AddPostfix<SlideCollectionContainer>("SetReadFlag", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.OnSlideRead));
-            ModHelper.HarmonyHelper.AddPostfix<SlideReelMusicManager>("PlayBackdrop", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.PlayBackdrop));
-            ModHelper.HarmonyHelper.AddPostfix<SlideReelMusicManager>("PlayBeat", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.PlayBeat));
-
         }
-
-        private static void PlayBackdrop(AudioType audioType)
-        {
-            _console.WriteLine("BACKDROP " + audioType.ToString());
-            _console.WriteLine(System.Environment.StackTrace);
-        }
-
-        private static void PlayBeat(AudioType audioType)
-        {
-            _console.WriteLine("BEAT " + audioType.ToString());
-            _console.WriteLine(System.Environment.StackTrace);
-        }
-
         private void Update()
         {
             if (_reelProyector != null)

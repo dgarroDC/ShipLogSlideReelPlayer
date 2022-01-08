@@ -38,21 +38,6 @@ namespace ShipLogSlideReelPlayer
             {
                 _overridenByEntries.Add(overridenByEntry.Value);
             }
-
-            _reel.Initialize();
-            if (_reel._slideCollection.slides[0].HasModule(typeof(SlideBackdropAudioModule)))
-            {
-                ShipLogSlideReelPlayer._console.WriteLine("BACKDROP:" + _id);
-            }
-            else if (_isVision)
-            {
-                ShipLogSlideReelPlayer._console.WriteLine("NO BACKDROP:" + _id);
-
-            }
-            if (_reel._slideCollection.slides[0].HasModule(typeof(SlideBeatAudioModule)))
-            {
-                ShipLogSlideReelPlayer._console.WriteLine("BEAT:" + _id);
-            }
         }
 
         public static ReelShipLogEntry LoadEntry(string astroObjectID, XElement entryNode, ShipLogManager shipLogManager)
