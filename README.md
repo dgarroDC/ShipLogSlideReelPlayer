@@ -2,7 +2,7 @@
 
 Play Echoes of the Eye slide reels in your ship log computer!
 
-![example](example.png)
+
 
 You can replay the slide reels (and also visions) in the map mode of the ship log, simply go the map mode and browse the entries in The Stranger. Each reel entry is shown under the log entry corresponding to the place the reel was found. It also plays audio!
 
