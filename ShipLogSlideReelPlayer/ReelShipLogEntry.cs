@@ -65,7 +65,7 @@ namespace ShipLogSlideReelPlayer
         public void UnloadStreamingTextures(List<string> wantedStreamingAssetIDs)
         {
             _reel.Initialize();
-            if (wantedStreamingAssetIDs != null && !wantedStreamingAssetIDs.Contains(_reel.streamingAssetID))
+            if (wantedStreamingAssetIDs == null || !wantedStreamingAssetIDs.Contains(_reel.streamingAssetID))
             {
                 if (_reel.streamingTexturesAvailable)
                 {
