@@ -35,7 +35,8 @@ namespace ShipLogSlideReelPlayer
             ModHelper.HarmonyHelper.AddPrefix<ShipLogDetectiveMode>("EnterMode", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.EnterDetectiveMode));
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("Initialize", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.AddMoreEntryListItemsAndCreateProyector));
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("SetEntryFocus", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.SetEntryFocus));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.CloseEntryMenu));
+            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
+            ModHelper.HarmonyHelper.AddPrefix<ShipLogController>("OnPlayerDeath", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
             ModHelper.HarmonyHelper.AddPostfix<SlideCollectionContainer>("SetReadFlag", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.OnSlideRead));
         }
         private void Update()
@@ -271,18 +272,12 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        private static void CloseEntryMenu(ShipLogMapMode __instance)
+        private static void UnloadAllTextures()
         {
-            // We need to check this because some properties in ShipLogMapMode could have uninitialized values and cause errors
-            // This works because this is a prefix patch
-            // (it wouldn't work as postfix, although checking _entryIndex >= 0 would also probably do the trick)
-            if (__instance._isEntryMenuOpen)
+            _reelProyector.RemoveReel();
+            foreach (ReelShipLogEntry entry in _reelEntries.Values)
             {
-                _reelProyector.RemoveReel();
-                for (int i = 0; i <= __instance._maxIndex; i++)
-                {
-                    UnloadStreamingTextures(__instance, i);
-                }
+                entry.UnloadStreamingTextures();
             }
         }
 
@@ -296,7 +291,7 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        private static void UnloadStreamingTextures(ShipLogMapMode mapMode, int index, List<string> wantedStreamingAssetIDs = null)
+        private static void UnloadStreamingTextures(ShipLogMapMode mapMode, int index, List<string> wantedStreamingAssetIDs)
         {
             index = Mod(index, mapMode._maxIndex + 1);
             ShipLogEntry entry = mapMode._listItems[index].GetEntry();
