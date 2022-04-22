@@ -36,7 +36,7 @@ namespace ShipLogSlideReelPlayer
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("Initialize", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.AddMoreEntryListItemsAndCreateProyector));
             ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("SetEntryFocus", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.SetEntryFocus));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogController>("OnPlayerDeath", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
+            ModHelper.HarmonyHelper.AddPrefix<DeathManager>("FinishDeathSequence", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
             ModHelper.HarmonyHelper.AddPostfix<SlideCollectionContainer>("SetReadFlag", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.OnSlideRead));
         }
         private void Update()
