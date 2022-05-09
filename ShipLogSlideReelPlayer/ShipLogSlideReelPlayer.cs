@@ -26,7 +26,8 @@ namespace ShipLogSlideReelPlayer
             _evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             _entriesFileLocation = ModHelper.Manifest.ModFolderPath + "ReelEntries.xml";
             ModHelper.HarmonyHelper.AddPostfix<ShipLogManager>("Awake", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.LoadReelEntries));
-            ModHelper.HarmonyHelper.AddPostfix<ShipLogManager>("GetEntriesByAstroBody", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntriesByAstroBody));
+            // Don't use ShipLogManager.GetEntriesByAstroBody to not interfere with the Suit Log mod
+            ModHelper.HarmonyHelper.AddPostfix<ShipLogAstroObject>("GetEntries", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntriesByAstroBody));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("HasMoreToExplore", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.HasMoreToExplore));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("HasUnreadFacts", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.HasUnreadFacts));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("GetState", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetState));
@@ -92,7 +93,7 @@ namespace ShipLogSlideReelPlayer
             _reelProyector = new ShipLogSlideProyector(__instance);
         }
 
-        private static void GetEntriesByAstroBody(string astroObjectID, List<ShipLogEntry> __result)
+        private static void GetEntriesByAstroBody(ShipLogAstroObject __instance, List<ShipLogEntry> __result)
         {
             List<ShipLogEntry> showLast = new List<ShipLogEntry>();
             if (_reelEntries.Count == 0)
@@ -101,7 +102,7 @@ namespace ShipLogSlideReelPlayer
             }
             foreach (ShipLogEntry entry in _reelEntries.Values)
             {
-                if (entry.GetAstroObjectID() != astroObjectID)
+                if (entry.GetAstroObjectID() != __instance._id)
                 {
                     continue;
                 }
