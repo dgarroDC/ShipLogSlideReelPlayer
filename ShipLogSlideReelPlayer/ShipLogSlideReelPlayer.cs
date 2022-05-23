@@ -26,8 +26,8 @@ namespace ShipLogSlideReelPlayer
             _evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             _entriesFileLocation = ModHelper.Manifest.ModFolderPath + "ReelEntries.xml";
             ModHelper.HarmonyHelper.AddPostfix<ShipLogManager>("Awake", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.LoadReelEntries));
-            // Don't use ShipLogManager.GetEntriesByAstroBody to not interfere with the Suit Log mod
-            ModHelper.HarmonyHelper.AddPostfix<ShipLogAstroObject>("GetEntries", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntriesByAstroBody));
+            // Don't use ShipLogManager.GetEntriesByAstroBody to not interfere with the Suit Log mod, use prefix to avoid duplication
+            ModHelper.HarmonyHelper.AddPrefix<ShipLogAstroObject>("GetEntries", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntriesByAstroBody));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("HasMoreToExplore", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.HasMoreToExplore));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("HasUnreadFacts", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.HasUnreadFacts));
             ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("GetState", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetState));
@@ -93,13 +93,16 @@ namespace ShipLogSlideReelPlayer
             _reelProyector = new ShipLogSlideProyector(__instance);
         }
 
-        private static void GetEntriesByAstroBody(ShipLogAstroObject __instance, List<ShipLogEntry> __result)
+        private static bool GetEntriesByAstroBody(ShipLogAstroObject __instance, ref List<ShipLogEntry> __result)
         {
-            List<ShipLogEntry> showLast = new List<ShipLogEntry>();
             if (_reelEntries.Count == 0)
             {
-                return;
+                // Can this happen?
+                return true;
             }
+            // We are adding the reel entries to the actual _entries, copy the list to avoid duplication
+            __result = new List<ShipLogEntry>(__instance._entries);
+            List<ShipLogEntry> showLast = new List<ShipLogEntry>();
             foreach (ShipLogEntry entry in _reelEntries.Values)
             {
                 if (entry.GetAstroObjectID() != __instance._id)
@@ -134,6 +137,7 @@ namespace ShipLogSlideReelPlayer
                 __result.Add(entry);
             }
 
+            return false;
         }
 
         private static bool HasMoreToExplore(ShipLogEntry __instance, ref bool __result)
