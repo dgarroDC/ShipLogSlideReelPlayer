@@ -1,31 +1,41 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
-    public class ShipLogSlideProjector
+    public class ShipLogSlideProjector : MonoBehaviour
     {
-        private ShipLogMapMode _mapMode;
+        private Image _photo;
         private SlideCollectionContainer _reel;
         private bool _isVision;
         private bool _playing;
 
-        private ScreenPrompt _forwardPrompt;
-        private ScreenPrompt _reversePrompt;
-        ScreenPromptList _prompList;
-        Material _originalPhotoMaterial;
-        Material _invertPhotoMaterial;
+        internal ScreenPrompt _forwardPrompt;
+        internal ScreenPrompt _reversePrompt;
 
-        public ShipLogSlideProjector(ShipLogMapMode mapMode)
+        private Material _originalPhotoMaterial;
+        private Material _invertPhotoMaterial;
+
+        public ShipLogSlideProjector()
         {
-            _mapMode = mapMode;
-            _originalPhotoMaterial = _mapMode._photo.material;
+            _photo = GetComponent<Image>();
+            _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
-            _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt) + "   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
-            _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt) + "   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
-            _prompList = mapMode._upperRightPromptList;
-            Locator.GetPromptManager().AddScreenPrompt(_forwardPrompt, _prompList, TextAnchor.MiddleRight, -1, false);
-            Locator.GetPromptManager().AddScreenPrompt(_reversePrompt, _prompList, TextAnchor.MiddleRight, -1, false);
+            _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt) + "   <CMD>");
+            _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt) + "   <CMD>");
+        }
+        
+        private void Update()   
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary))
+            {
+                NextSlide();
+            }
+            if (OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary))
+            {
+                PreviousSlide();
+            }
         }
 
         public void PlaceReel(SlideCollectionContainer reel, bool isVision)
@@ -45,9 +55,9 @@ namespace ShipLogSlideReelPlayer
             if (!_isVision)
             {
                 // Texture from reels are inverted, use shader to invert it back
-                if (_mapMode._photo.material != _invertPhotoMaterial)
+                if (_photo.material != _invertPhotoMaterial)
                 {
-                    _mapMode._photo.material = _invertPhotoMaterial;
+                    _photo.material = _invertPhotoMaterial;
                 }
             }
             else
@@ -83,7 +93,7 @@ namespace ShipLogSlideReelPlayer
                 Texture2D texture = _reel.GetCurrentSlideTexture() as Texture2D;
                 if (texture != null)
                 {
-                    _mapMode._photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                    _photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
                 }
             }
         }
@@ -135,9 +145,9 @@ namespace ShipLogSlideReelPlayer
 
         public void RestoreOriginalMaterial()
         {
-            if (_mapMode._photo.material != _originalPhotoMaterial)
+            if (_photo.material != _originalPhotoMaterial)
             {
-                _mapMode._photo.material = _originalPhotoMaterial;
+                _photo.material = _originalPhotoMaterial;
             }
         }
     }

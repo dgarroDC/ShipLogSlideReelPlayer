@@ -53,25 +53,21 @@ namespace ShipLogSlideReelPlayer
             projector.PlaceReel(_reel, _isVision);
         }
 
-        public void LoadStreamingTextures(List<string> wantedStreamingAssetIDs)
+        public void LoadStreamingTextures()
         {
             _reel.Initialize();
-            wantedStreamingAssetIDs.Add(_reel.streamingAssetID);
             if (_reel.streamingTexturesAvailable)
             {
                 // Always true?
                 _reel.LoadStreamingTextures();
             }
         }
-        public void UnloadStreamingTextures(List<string> wantedStreamingAssetIDs = null)
+        public void UnloadStreamingTextures()
         {
             _reel.Initialize();
-            if (wantedStreamingAssetIDs == null || !wantedStreamingAssetIDs.Contains(_reel.streamingAssetID))
+            if (_reel.streamingTexturesAvailable)
             {
-                if (_reel.streamingTexturesAvailable)
-                {
-                    _reel.UnloadStreamingTextures();
-                }
+                _reel.UnloadStreamingTextures();
             }
         }
 

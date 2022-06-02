@@ -32,20 +32,6 @@ namespace ShipLogSlideReelPlayer
             _entriesFileLocation = ModHelper.Manifest.ModFolderPath + "ReelEntries.xml";
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
         }
-        private void Update()
-        {
-            if (_reelProjector != null)
-            {
-                if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
-                {
-                    _reelProjector.NextSlide();
-                }
-                if (OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary, InputMode.All))
-                {
-                    _reelProjector.PreviousSlide();
-                }
-            }
-        }
 
         public override void Configure(IModConfig config)
         {
@@ -82,7 +68,9 @@ namespace ShipLogSlideReelPlayer
                 mapMode._listItems[i].Init(mapMode._fontAndLanguageController);
             }
 
-            _reelProjector = new ShipLogSlideProjector(mapMode);
+            _reelProjector = mapMode._photo.gameObject.AddComponent<ShipLogSlideProjector>();
+            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._forwardPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._reversePrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
         }
 
         public bool HasAncestor(ShipLogEntry entry, string ancestor)
@@ -105,7 +93,6 @@ namespace ShipLogSlideReelPlayer
         {
             _reelProjector.RemoveReel();
 
-            List<string> wantedStreamingAssetIDs = new List<string>();
             int index = mapMode._entryIndex;
             ShipLogEntry entry = mapMode._listItems[index].GetEntry();
             if (entry is ReelShipLogEntry reelEntry)
@@ -113,7 +100,7 @@ namespace ShipLogSlideReelPlayer
                 // Loading the textures is probably only necessary in case no real entries are revealed,
                 // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
                 reelEntry.PlaceReelOnProjector(_reelProjector);
-                reelEntry.LoadStreamingTextures(wantedStreamingAssetIDs);
+                reelEntry.LoadStreamingTextures();
             }
             else
             {
@@ -123,23 +110,21 @@ namespace ShipLogSlideReelPlayer
                 _reelProjector.RestoreOriginalMaterial();
             }
 
-            // Load textures of neighbors to avoid delay with white photo when displaying the entry,
-            // also make sure not to unload reels with streaming assets with want
+            // Load textures of neighbors to avoid delay with white photo when displaying the entry
             int entryCount = mapMode._maxIndex + 1;
             if (entryCount >= 2)
             {
-                LoadStreamingTextures(mapMode, index - 1, wantedStreamingAssetIDs);
+                ShipLogEntry prevEntry = mapMode._listItems[Mod(index - 1, entryCount)].GetEntry();
+                if (prevEntry is ReelShipLogEntry prevReelEntry)
+                {
+                    prevReelEntry.LoadStreamingTextures();
+                }
                 if (entryCount >= 3)
                 {
-                    LoadStreamingTextures(mapMode, index + 1, wantedStreamingAssetIDs);
-                    // The unload ones won't do nothing while the game is paused (see ShipLogMapMode_CloseEntryMenu)
-                    if (entryCount >= 4)
+                    ShipLogEntry nextEntry = mapMode._listItems[Mod(index + 1, entryCount)].GetEntry();
+                    if (nextEntry is ReelShipLogEntry nextReelEntry)
                     {
-                        UnloadStreamingTextures(mapMode, index - 2, wantedStreamingAssetIDs);
-                        if (entryCount >= 5)
-                        {
-                            UnloadStreamingTextures(mapMode, index + 2, wantedStreamingAssetIDs);
-                        }
+                        nextReelEntry.LoadStreamingTextures();
                     }
                 }
             }
@@ -151,26 +136,6 @@ namespace ShipLogSlideReelPlayer
             foreach (ReelShipLogEntry entry in ReelEntries.Values)
             {
                 entry.UnloadStreamingTextures();
-            }
-        }
-
-        private static void LoadStreamingTextures(ShipLogMapMode mapMode, int index, List<string> wantedStreamingAssetIDs)
-        {
-            index = Mod(index, mapMode._maxIndex + 1);
-            ShipLogEntry entry = mapMode._listItems[index].GetEntry();
-            if (entry is ReelShipLogEntry reelEntry)
-            {
-                reelEntry.LoadStreamingTextures(wantedStreamingAssetIDs);
-            }
-        }
-
-        private static void UnloadStreamingTextures(ShipLogMapMode mapMode, int index, List<string> wantedStreamingAssetIDs)
-        {
-            index = Mod(index, mapMode._maxIndex + 1);
-            ShipLogEntry entry = mapMode._listItems[index].GetEntry();
-            if (entry is ReelShipLogEntry reelEntry)
-            {
-                reelEntry.UnloadStreamingTextures(wantedStreamingAssetIDs);
             }
         }
 
