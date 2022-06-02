@@ -6,39 +6,31 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.IO;
 using System;
+using System.Reflection;
+using HarmonyLib;
 
 namespace ShipLogSlideReelPlayer
 {
     public class ShipLogSlideReelPlayer : ModBehaviour
     {
-        public static Dictionary<string, ReelShipLogEntry> _reelEntries;
-        public static Shader _evilShader;
+        public static ShipLogSlideReelPlayer Instance;
 
-        public static bool _enabled;
-        public static bool _showAll;
+        public Dictionary<string, ReelShipLogEntry> ReelEntries;
+        public Shader evilShader;
+
+        public bool modEnabled;
+        public bool showAll;
 
         private static ShipLogSlideProyector _reelProyector;
         private static string _entriesFileLocation;
 
         private void Start()
         {
+            Instance = this;
             AssetBundle bundle = ModHelper.Assets.LoadBundle("Assets/evilshader");
-            _evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
+            evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             _entriesFileLocation = ModHelper.Manifest.ModFolderPath + "ReelEntries.xml";
-            ModHelper.HarmonyHelper.AddPostfix<ShipLogManager>("Awake", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.LoadReelEntries));
-            // Don't use ShipLogManager.GetEntriesByAstroBody to not interfere with the Suit Log mod, use prefix to avoid duplication
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogAstroObject>("GetEntries", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntriesByAstroBody));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("HasMoreToExplore", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.HasMoreToExplore));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("HasUnreadFacts", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.HasUnreadFacts));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogEntry>("GetState", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetState));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogEntryListItem>("UpdateNameField", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UpdateNameField));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogEntryListItem>("GetEntryIndentation", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.GetEntryIndentation));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogDetectiveMode>("EnterMode", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.EnterDetectiveMode));
-            ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("Initialize", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.AddMoreEntryListItemsAndCreateProyector));
-            ModHelper.HarmonyHelper.AddPostfix<ShipLogMapMode>("SetEntryFocus", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.SetEntryFocus));
-            ModHelper.HarmonyHelper.AddPrefix<ShipLogMapMode>("CloseEntryMenu", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
-            ModHelper.HarmonyHelper.AddPrefix<DeathManager>("FinishDeathSequence", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.UnloadAllTextures));
-            ModHelper.HarmonyHelper.AddPostfix<SlideCollectionContainer>("SetReadFlag", typeof(ShipLogSlideReelPlayer), nameof(ShipLogSlideReelPlayer.OnSlideRead));
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
         }
         private void Update()
         {
@@ -57,196 +49,71 @@ namespace ShipLogSlideReelPlayer
 
         public override void Configure(IModConfig config)
         {
-            _enabled = config.Enabled;
-            _showAll = config.GetSettingsValue<bool>("Show all reels (WARNING: SPOILERS)");
+            modEnabled = config.Enabled;
+            showAll = config.GetSettingsValue<bool>("Show all reels (WARNING: SPOILERS)");
         }
 
-        private static void LoadReelEntries(ShipLogManager __instance)
+        internal void LoadReelEntries(ShipLogManager shipLogManager)
         {
-            _reelEntries = new Dictionary<string, ReelShipLogEntry>();
+            ReelEntries = new Dictionary<string, ReelShipLogEntry>();
             string entriesFileData = File.ReadAllText(_entriesFileLocation);
             XElement xelement = XDocument.Parse(entriesFileData).Element("AstroObjectEntry");
             string astroObjectID = xelement.Element("ID").Value;
             foreach (XElement entryNode in xelement.Elements("Entry"))
             {
-                ReelShipLogEntry entry = ReelShipLogEntry.LoadEntry(astroObjectID, entryNode, __instance);
-                _reelEntries.Add(entry.GetID(), entry);
+                ReelShipLogEntry entry = ReelShipLogEntry.LoadEntry(astroObjectID, entryNode, shipLogManager);
+                ReelEntries.Add(entry.GetID(), entry);
             }
         }
 
-        private static void AddMoreEntryListItemsAndCreateProyector(ShipLogMapMode __instance)
+        internal void AddMoreEntryListItemsAndCreateProyector(ShipLogMapMode mapMode)
         {
             // The 32 items aren't enough after adding the reel entries
-            int prevSize = __instance._listItems.Length;
-            int newSize = prevSize + _reelEntries.Count;
-            Array.Resize(ref __instance._listItems, newSize);
+            int prevSize = mapMode._listItems.Length;
+            int newSize = prevSize + ReelEntries.Count;
+            Array.Resize(ref mapMode._listItems, newSize);
             // Copy of ShipLogMapMode.Initialize
             for (int i = prevSize; i < newSize; i++)
             {
-                GameObject template = __instance._listItems[0].gameObject; // The original was destroyed at this point...
+                GameObject template = mapMode._listItems[0].gameObject; // The original was destroyed at this point...
                 GameObject gameObject = Instantiate(template, template.transform.parent);
                 gameObject.name = "EntryListItem_" + i;
-                __instance._listItems[i] = gameObject.GetComponent<ShipLogEntryListItem>();
-                __instance._listItems[i].Init(__instance._fontAndLanguageController);
+                mapMode._listItems[i] = gameObject.GetComponent<ShipLogEntryListItem>();
+                mapMode._listItems[i].Init(mapMode._fontAndLanguageController);
             }
 
-            _reelProyector = new ShipLogSlideProyector(__instance);
+            _reelProyector = new ShipLogSlideProyector(mapMode);
         }
 
-        private static bool GetEntriesByAstroBody(ShipLogAstroObject __instance, ref List<ShipLogEntry> __result)
+        public bool HasAncestor(ShipLogEntry entry, string ancestor)
         {
-            if (_reelEntries.Count == 0)
+            if (entry.HasParent() && entry.GetParentID() == ancestor)
             {
-                // Can this happen?
                 return true;
             }
-            // We are adding the reel entries to the actual _entries, copy the list to avoid duplication
-            __result = new List<ShipLogEntry>(__instance._entries);
-            List<ShipLogEntry> showLast = new List<ShipLogEntry>();
-            foreach (ShipLogEntry entry in _reelEntries.Values)
+
+            if (ReelEntries.ContainsKey(entry.GetID()))
             {
-                if (entry.GetAstroObjectID() != __instance._id)
-                {
-                    continue;
-                }
-                if (entry.HasRevealedParent())
-                {
-                    for (int i = 0; i < __result.Count; i++)
-                    {
-                        if (__result[i].GetID().Equals(entry.GetParentID()))
-                        {
-                            // Add to the end of descendants
-                            int j = i + 1;
-                            while(j < __result.Count && HasAncestor(__result[j], entry.GetParentID()))
-                            {
-                                j++;
-                            }
-                            __result.Insert(j, entry);
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    // We want to show them in case the show all reel options is enabled
-                    showLast.Add(entry);
-                }
-            }
-            foreach (ShipLogEntry entry in showLast)
-            {
-                __result.Add(entry);
+                ReelShipLogEntry reelEntry = entry as ReelShipLogEntry;
+                return reelEntry.IsGrandChildOf(ancestor);
             }
 
             return false;
         }
 
-        private static bool HasMoreToExplore(ShipLogEntry __instance, ref bool __result)
-        {
-            bool isReelEntry = _reelEntries.TryGetValue(__instance.GetID(), out ReelShipLogEntry entry);
-            if (isReelEntry)
-            {
-                __result = entry.HasMoreToExplore();
-                return false;
-            }
-            return true;
-        }
-
-        private static bool HasUnreadFacts(ShipLogEntry __instance, ref bool __result)
-        {
-            bool isReelEntry = _reelEntries.TryGetValue(__instance.GetID(), out ReelShipLogEntry entry);
-            if (isReelEntry)
-            {
-                __result = entry.HasUnreadFacts();
-                return false;
-            }
-            return true;
-        }
-
-        private static bool GetState(ShipLogEntry __instance, ref ShipLogEntry.State __result)
-        {
-            bool isReelEntry = _reelEntries.TryGetValue(__instance.GetID(), out ReelShipLogEntry entry);
-            if (isReelEntry)
-            {
-                __result = entry.GetState();
-                return false;
-            }
-            return true;
-        }
-
-        private static bool HasAncestor(ShipLogEntry entry, string ancestor)
-        {
-            if (entry.HasParent() && entry.GetParentID() == ancestor)
-            {
-                return true;
-            } else
-            {
-                if (_reelEntries.ContainsKey(entry.GetID()))
-                {
-                    ReelShipLogEntry reelEntry = entry as ReelShipLogEntry;
-                    return reelEntry.IsGrandChildOf(ancestor);
-                } else
-                {
-                    return false;
-                }
-            }
-        }
-
-        private static bool UpdateNameField(ref Text ____nameField, ref ShipLogEntry ____entry)
-        {
-            if (_reelEntries.ContainsKey(____entry.GetID()))
-            {
-                // Don't use GetName() to avoid trying to translate it and fill the logs with errors
-                ____nameField.text = ____entry._name; 
-                ____nameField.color = new Color32(144, 254, 243, 255);
-                return false;
-            }
-            return true;
-        }
-
-        private static bool GetEntryIndentation(ref ShipLogEntryListItem __instance, ref float __result)
-        {
-            bool isReelEntry = _reelEntries.TryGetValue(__instance._entry.GetID(), out ReelShipLogEntry entry);
-            if (isReelEntry)
-            {
-                if (entry.HasRevealedParent() && entry.HasRevealedGrandParent())
-                {
-                    // Unlike normal entries, a reel entry can be child of a nested entry
-                    __result = 60f;
-                    return false;
-                } 
-            }
-            return true;
-        }
-
-        private static void EnterDetectiveMode(ref string entryID)
-        {
-            // Reel entries doesn't have a corresponding card on detective mode, so focus in its parent (if revealed)
-            bool isReelEntry = _reelEntries.TryGetValue(entryID, out ReelShipLogEntry entry);
-            if (isReelEntry)
-            {
-                if (entry.HasRevealedParent())
-                {
-                    entryID = entry.GetParentID();
-                } else
-                {
-                    entryID = "";
-                }
-            }
-        }
-
-        private static void SetEntryFocus(ShipLogMapMode __instance)
+        internal void OnEntrySelected(ShipLogMapMode mapMode)
         {
             _reelProyector.RemoveReel();
 
             List<string> wantedStreamingAssetIDs = new List<string>();
-            int index = __instance._entryIndex;
-            ShipLogEntry entry = __instance._listItems[index].GetEntry();
-            if (_reelEntries.ContainsKey(entry.GetID()))
+            int index = mapMode._entryIndex;
+            ShipLogEntry entry = mapMode._listItems[index].GetEntry();
+            if (entry is ReelShipLogEntry reelEntry)
             {
                 // Loading the textures is probably only necessary in case no real entries are revealed,
                 // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
-                (entry as ReelShipLogEntry).PlaceReelOnProyector(_reelProyector);
-                (entry as ReelShipLogEntry).LoadStreamingTextures(wantedStreamingAssetIDs);
+                reelEntry.PlaceReelOnProyector(_reelProyector);
+                reelEntry.LoadStreamingTextures(wantedStreamingAssetIDs);
             }
             else
             {
@@ -258,29 +125,30 @@ namespace ShipLogSlideReelPlayer
 
             // Load textures of neighbors to avoid delay with white photo when displaying the entry,
             // also make sure not to unload reels with streaming assets with want
-            int entryCount = __instance._maxIndex + 1;
+            int entryCount = mapMode._maxIndex + 1;
             if (entryCount >= 2)
             {
-                LoadStreamingTextures(__instance, index - 1, wantedStreamingAssetIDs);
+                LoadStreamingTextures(mapMode, index - 1, wantedStreamingAssetIDs);
                 if (entryCount >= 3)
                 {
-                    LoadStreamingTextures(__instance, index + 1, wantedStreamingAssetIDs);
+                    LoadStreamingTextures(mapMode, index + 1, wantedStreamingAssetIDs);
+                    // The unload ones won't do nothing while the game is paused (see ShipLogMapMode_CloseEntryMenu)
                     if (entryCount >= 4)
                     {
-                        UnloadStreamingTextures(__instance, index - 2, wantedStreamingAssetIDs);
+                        UnloadStreamingTextures(mapMode, index - 2, wantedStreamingAssetIDs);
                         if (entryCount >= 5)
                         {
-                            UnloadStreamingTextures(__instance, index + 2, wantedStreamingAssetIDs);
+                            UnloadStreamingTextures(mapMode, index + 2, wantedStreamingAssetIDs);
                         }
                     }
                 }
             }
         }
 
-        private static void UnloadAllTextures()
+        internal void UnloadAllTextures()
         {
             _reelProyector.RemoveReel();
-            foreach (ReelShipLogEntry entry in _reelEntries.Values)
+            foreach (ReelShipLogEntry entry in ReelEntries.Values)
             {
                 entry.UnloadStreamingTextures();
             }
@@ -290,9 +158,9 @@ namespace ShipLogSlideReelPlayer
         {
             index = Mod(index, mapMode._maxIndex + 1);
             ShipLogEntry entry = mapMode._listItems[index].GetEntry();
-            if (_reelEntries.ContainsKey(entry.GetID()))
+            if (entry is ReelShipLogEntry reelEntry)
             {
-                (entry as ReelShipLogEntry).LoadStreamingTextures(wantedStreamingAssetIDs);
+                reelEntry.LoadStreamingTextures(wantedStreamingAssetIDs);
             }
         }
 
@@ -300,24 +168,15 @@ namespace ShipLogSlideReelPlayer
         {
             index = Mod(index, mapMode._maxIndex + 1);
             ShipLogEntry entry = mapMode._listItems[index].GetEntry();
-            if (_reelEntries.ContainsKey(entry.GetID()))
+            if (entry is ReelShipLogEntry reelEntry)
             {
-                (entry as ReelShipLogEntry).UnloadStreamingTextures(wantedStreamingAssetIDs);
+                reelEntry.UnloadStreamingTextures(wantedStreamingAssetIDs);
             }
         }
 
         static int Mod(int x, int m)
         {
             return (x % m + m) % m;
-        }
-
-        private static void OnSlideRead(SlideCollectionContainer __instance)
-        {
-            bool isReelEntry = _reelEntries.TryGetValue(__instance.name, out ReelShipLogEntry entry);
-            if (isReelEntry)
-            {
-                entry.CheckRead();
-            }
         }
     }
 }

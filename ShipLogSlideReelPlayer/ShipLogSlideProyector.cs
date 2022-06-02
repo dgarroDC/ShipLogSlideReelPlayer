@@ -19,7 +19,7 @@ namespace ShipLogSlideReelPlayer
         {
             _mapMode = mapMode;
             _originalPhotoMaterial = _mapMode._photo.material;
-            _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer._evilShader);
+            _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt) + "   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt) + "   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);

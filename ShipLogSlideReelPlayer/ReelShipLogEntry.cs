@@ -16,6 +16,7 @@ namespace ShipLogSlideReelPlayer
         private ReelShipLogEntry(string astroObjectID, XElement entryNode, ShipLogEntry parentEntry) : base(astroObjectID, entryNode, parentEntry.GetID())
         {
             _state = State.Hidden;
+            // The reel entries are created when a game is loaded, so it's ok to do this
             if (PlayerData.GetPersistentCondition(GetReadCondition()))
             {
                 _state = State.Explored;
@@ -91,28 +92,30 @@ namespace ShipLogSlideReelPlayer
             _state = State.Explored;
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
+
         public new bool HasUnreadFacts()
         {
             return false;
         }
+
         public new bool HasMoreToExplore()
         {
             return _overridenByEntries.Count > 0;
         }
 
-        public new ShipLogEntry.State GetState()
+        public new State GetState()
         {
-            if (!ShipLogSlideReelPlayer._enabled)
+            if (!ShipLogSlideReelPlayer.Instance.modEnabled)
             {
                 return State.Hidden;
             }
-            if (ShipLogSlideReelPlayer._showAll)
+            if (ShipLogSlideReelPlayer.Instance.showAll)
             {
                 return State.Explored;
             }
             foreach (string overridenByEntry in _overridenByEntries)
             {
-                if (ShipLogSlideReelPlayer._reelEntries.GetValueOrDefault(overridenByEntry).GetState() == State.Explored)
+                if (ShipLogSlideReelPlayer.Instance.ReelEntries.GetValueOrDefault(overridenByEntry).GetState() == State.Explored)
                 {
                     return State.Hidden;
                 }

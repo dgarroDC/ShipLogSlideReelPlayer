@@ -8,6 +8,7 @@
     <Copyright>Copyright ©  2020</Copyright>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -22,8 +23,9 @@
     <None Remove="ReelEntries.xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="HarmonyX" Version="2.10.0" />
     <PackageReference Include="OWML" Version="2.1.0" />
-    <PackageReference Include="OuterWildsGameLibs" Version="1.1.11.73" />
+    <PackageReference Include="OuterWildsGameLibs" Version="1.1.12.168" />
   </ItemGroup>
   <ItemGroup>
     <None Include="default-config.json">
