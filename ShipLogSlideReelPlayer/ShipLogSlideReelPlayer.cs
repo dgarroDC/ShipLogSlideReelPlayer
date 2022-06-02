@@ -21,7 +21,7 @@ namespace ShipLogSlideReelPlayer
         public bool modEnabled;
         public bool showAll;
 
-        private static ShipLogSlideProyector _reelProyector;
+        private static ShipLogSlideProjector _reelProjector;
         private static string _entriesFileLocation;
 
         private void Start()
@@ -34,15 +34,15 @@ namespace ShipLogSlideReelPlayer
         }
         private void Update()
         {
-            if (_reelProyector != null)
+            if (_reelProjector != null)
             {
                 if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
                 {
-                    _reelProyector.NextSlide();
+                    _reelProjector.NextSlide();
                 }
                 if (OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary, InputMode.All))
                 {
-                    _reelProyector.PreviousSlide();
+                    _reelProjector.PreviousSlide();
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        internal void AddMoreEntryListItemsAndCreateProyector(ShipLogMapMode mapMode)
+        internal void AddMoreEntryListItemsAndCreateProjector(ShipLogMapMode mapMode)
         {
             // The 32 items aren't enough after adding the reel entries
             int prevSize = mapMode._listItems.Length;
@@ -82,7 +82,7 @@ namespace ShipLogSlideReelPlayer
                 mapMode._listItems[i].Init(mapMode._fontAndLanguageController);
             }
 
-            _reelProyector = new ShipLogSlideProyector(mapMode);
+            _reelProjector = new ShipLogSlideProjector(mapMode);
         }
 
         public bool HasAncestor(ShipLogEntry entry, string ancestor)
@@ -103,7 +103,7 @@ namespace ShipLogSlideReelPlayer
 
         internal void OnEntrySelected(ShipLogMapMode mapMode)
         {
-            _reelProyector.RemoveReel();
+            _reelProjector.RemoveReel();
 
             List<string> wantedStreamingAssetIDs = new List<string>();
             int index = mapMode._entryIndex;
@@ -112,7 +112,7 @@ namespace ShipLogSlideReelPlayer
             {
                 // Loading the textures is probably only necessary in case no real entries are revealed,
                 // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
-                reelEntry.PlaceReelOnProyector(_reelProyector);
+                reelEntry.PlaceReelOnProjector(_reelProjector);
                 reelEntry.LoadStreamingTextures(wantedStreamingAssetIDs);
             }
             else
@@ -120,7 +120,7 @@ namespace ShipLogSlideReelPlayer
                 // Don't restore the material every time we remove a reel,
                 // otherwise changing to rumor mode or map we would briefly see the inverted reel textures
                 // Placing a vision reel also restore the material in the other branch
-                _reelProyector.RestoreOriginalMaterial();
+                _reelProjector.RestoreOriginalMaterial();
             }
 
             // Load textures of neighbors to avoid delay with white photo when displaying the entry,
@@ -147,7 +147,7 @@ namespace ShipLogSlideReelPlayer
 
         internal void UnloadAllTextures()
         {
-            _reelProyector.RemoveReel();
+            _reelProjector.RemoveReel();
             foreach (ReelShipLogEntry entry in ReelEntries.Values)
             {
                 entry.UnloadStreamingTextures();

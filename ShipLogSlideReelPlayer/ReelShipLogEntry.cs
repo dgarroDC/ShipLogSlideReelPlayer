@@ -48,9 +48,9 @@ namespace ShipLogSlideReelPlayer
             return new ReelShipLogEntry(astroObjectID, entryNode, parentEntry);
         }
 
-        public void PlaceReelOnProyector(ShipLogSlideProyector proyector)
+        public void PlaceReelOnProjector(ShipLogSlideProjector projector)
         {
-            proyector.PlaceReel(_reel, _isVision);
+            projector.PlaceReel(_reel, _isVision);
         }
 
         public void LoadStreamingTextures(List<string> wantedStreamingAssetIDs)

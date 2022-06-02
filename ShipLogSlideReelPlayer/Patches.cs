@@ -146,7 +146,7 @@ namespace ShipLogSlideReelPlayer
         [HarmonyPatch(typeof(ShipLogMapMode), nameof(ShipLogMapMode.Initialize))]
         private static void ShipLogMapMode_Initializer(ShipLogMapMode __instance)
         {
-            ShipLogSlideReelPlayer.Instance.AddMoreEntryListItemsAndCreateProyector(__instance);
+            ShipLogSlideReelPlayer.Instance.AddMoreEntryListItemsAndCreateProjector(__instance);
         }
         
         [HarmonyPostfix]
