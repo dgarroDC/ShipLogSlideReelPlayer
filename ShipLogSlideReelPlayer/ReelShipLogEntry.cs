@@ -93,6 +93,12 @@ namespace ShipLogSlideReelPlayer
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
 
+        public new string GetName(bool withLineBreaks)
+        {
+            // Color is added here to make it easier to Suit Log
+            return "<color=#90FEF3>" + _name + "</color>";
+        }
+
         public new bool HasUnreadFacts()
         {
             return false;

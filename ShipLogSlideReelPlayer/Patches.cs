@@ -97,15 +97,12 @@ namespace ShipLogSlideReelPlayer
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(ShipLogEntryListItem), nameof(ShipLogEntryListItem.UpdateNameField))]
-        private static bool ShipLogEntryListItem_UpdateNameField(ref Text ____nameField, ref ShipLogEntry ____entry)
+        [HarmonyPatch(typeof(ShipLogEntry), nameof(ShipLogEntry.GetName))]
+        private static bool ShipLogEntryListItem_UpdateNameField(ShipLogEntry __instance, ref string __result, ref bool withLineBreaks)
         {
-            if (____entry is ReelShipLogEntry)
+            if (__instance is ReelShipLogEntry entry)
             {
-                // Don't use GetName() to avoid trying to translate it and fill the logs with errors
-                // TODO: Patch GetName(), use <color>?
-                ____nameField.text = ____entry._name; 
-                ____nameField.color = new Color32(144, 254, 243, 255);
+                __result = entry.GetName(withLineBreaks);
                 return false;
             }
             return true;
