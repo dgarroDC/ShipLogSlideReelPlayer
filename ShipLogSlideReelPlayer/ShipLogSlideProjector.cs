@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
@@ -21,6 +22,7 @@ namespace ShipLogSlideReelPlayer
             _photo = GetComponent<Image>();
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
+            // Is this inverted ok for Suit Log?
 
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt) + "   <CMD>");
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt) + "   <CMD>");
@@ -149,6 +151,50 @@ namespace ShipLogSlideReelPlayer
             {
                 _photo.material = _originalPhotoMaterial;
             }
+        }
+
+        public void OnEntrySelected(Func<int, ShipLogEntry> indexToEntry, int index, int entryCount)
+        {
+            RemoveReel();
+            ShipLogEntry entry = indexToEntry.Invoke(index);
+            if (entry is ReelShipLogEntry reelEntry)
+            {
+                // Loading the textures is probably only necessary in case no real entries are revealed,
+                // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
+                reelEntry.PlaceReelOnProjector(this);
+                reelEntry.LoadStreamingTextures();
+            }
+            else
+            {
+                // Don't restore the material every time we remove a reel,
+                // otherwise changing to rumor mode or map we would briefly see the inverted reel textures
+                // Placing a vision reel also restore the material in the other branch
+                RestoreOriginalMaterial();
+            }
+
+            // Load textures of neighbors to avoid delay with white photo when displaying the entry
+            if (entryCount >= 2)
+            {
+                ShipLogEntry prevEntry = indexToEntry.Invoke(Mod(index - 1, entryCount));
+                if (prevEntry is ReelShipLogEntry prevReelEntry)
+                {
+                    prevReelEntry.LoadStreamingTextures();
+                }
+
+                if (entryCount >= 3)
+                {
+                    ShipLogEntry nextEntry = indexToEntry.Invoke(Mod(index + 1, entryCount));
+                    if (nextEntry is ReelShipLogEntry nextReelEntry)
+                    {
+                        nextReelEntry.LoadStreamingTextures();
+                    }
+                }
+            }
+        }
+
+        private static int Mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
     }
 }

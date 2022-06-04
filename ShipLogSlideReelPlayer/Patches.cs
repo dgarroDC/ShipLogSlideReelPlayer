@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
@@ -144,27 +144,32 @@ namespace ShipLogSlideReelPlayer
         
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ShipLogMapMode), nameof(ShipLogMapMode.Initialize))]
-        private static void ShipLogMapMode_Initializer(ShipLogMapMode __instance)
+        private static void ShipLogMapMode_Initialize(ShipLogMapMode __instance)
         {
-            ShipLogSlideReelPlayer.Instance.AddMoreEntryListItemsAndCreateProjector(__instance);
+            ShipLogSlideReelPlayer.Instance.AddMoreEntryListItems(__instance);
+            GameObject mapModePhoto = __instance._photo.gameObject;
+            Action<ScreenPrompt> promptPlacer = prompt => 
+                Locator.GetPromptManager().AddScreenPrompt(prompt, __instance._upperRightPromptList, TextAnchor.MiddleRight);
+            ShipLogSlideReelPlayer.Instance.AddProjector(mapModePhoto, promptPlacer);
         }
         
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ShipLogMapMode), nameof(ShipLogMapMode.SetEntryFocus))]
         private static void ShipLogMapMode_SetEntryFocus(ShipLogMapMode __instance)
         {
-            ShipLogSlideReelPlayer.Instance.OnEntrySelected(__instance);
+            GameObject mapModePhoto = __instance._photo.gameObject;
+            Func<int,ShipLogEntry> indexToEntry = i => __instance._listItems[i].GetEntry();
+            ShipLogSlideReelPlayer.Instance.SelectEntry(mapModePhoto, indexToEntry, __instance._entryIndex, __instance._maxIndex + 1);
         }
-        
-        // TODO: Why prefixes?
-        
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ShipLogMapMode), nameof(ShipLogMapMode.CloseEntryMenu))]
         private static void ShipLogMapMode_CloseEntryMenu(ShipLogMapMode __instance)
         {
+            // We want to stop the music but we don't want to restore material (see comment in OnEntrySelected)
+            ShipLogSlideReelPlayer.Instance.Close(__instance._photo.gameObject, false);
             // Note: Texture aren't unloaded while the game is paused (StreamingIteratedTextureAssetBundle.Update())
             // textured unloaded by updating slide index are, meaning that up to 5*#Reels textures could be loaded
-            ShipLogSlideReelPlayer.Instance.UnloadAllTextures();
         }
         
         [HarmonyPrefix]
