@@ -189,5 +189,18 @@ namespace ShipLogSlideReelPlayer
                 entry.CheckRead();
             }
         }
+        
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(SlideProjector), nameof(SlideProjector.OnPressInteract))]
+        private static void SlideProjector_OnPressInteract(SlideReelItem ____slideItem, SlideProjector __instance)
+        {
+            if (____slideItem != null && ____slideItem.slidesContainer.streamingTexturesAvailable)
+            {
+                // We need a patch because viewing reels from entries could unload the next/prev slide of this projector
+                // by calling RequestManualStreamSlides, causing the projector to "lock" because of
+                // (Prev|Next)SlideAvailable() returning false
+                ____slideItem.slidesContainer.LoadStreamingTextures();
+            }
+        }
     }
 }

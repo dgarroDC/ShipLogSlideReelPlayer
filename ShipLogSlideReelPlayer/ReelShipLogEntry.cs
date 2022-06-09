@@ -26,7 +26,7 @@ namespace ShipLogSlideReelPlayer
             {
                 if (reel.name == _id)
                 {
-                    _reel = reel;
+                    _reel = CopySlideCollectionContainer(reel);
                     break;
                 }
             }
@@ -39,6 +39,31 @@ namespace ShipLogSlideReelPlayer
             {
                 _overridenByEntries.Add(overridenByEntry.Value);
             }
+        }
+
+        private SlideCollectionContainer CopySlideCollectionContainer(SlideCollectionContainer original)
+        {
+            SlideCollectionContainer copy = new GameObject("ReelEntry_" + original.name).AddComponent<SlideCollectionContainer>();
+            copy.enabled = false;
+
+            // _shipLogOnComplete leave it null
+            copy._autoLoadStreaming = original._autoLoadStreaming;
+            copy._invertBlackFrames = original._invertBlackFrames; // Probably unused
+            copy._slideCollection = CopySlideCollection(original._slideCollection);
+            
+            return copy;
+        }
+
+        private SlideCollection CopySlideCollection(SlideCollection original)
+        {
+            SlideCollection copy = new SlideCollection(original.slides.Length);
+            copy.streamingAssetIdentifier = original.streamingAssetIdentifier;
+            for (var i = 0; i < copy.slides.Length; i++)
+            {
+                copy.slides[i] = new Slide(original.slides[i]);
+            }
+
+            return copy;
         }
 
         public static ReelShipLogEntry LoadEntry(string astroObjectID, XElement entryNode, ShipLogManager shipLogManager)
@@ -64,9 +89,14 @@ namespace ShipLogSlideReelPlayer
         }
         public void UnloadStreamingTextures()
         {
-            _reel.Initialize();
-            if (_reel.streamingTexturesAvailable)
+            if (_reel._initialized && _reel.streamingTexturesAvailable)
             {
+                // This should ensure that textures were loaded and _reel was subscribed to the asset bundle,
+                // this is important because UnloadStreamingTextures ignores the subscriberCount if _textureAssetBundle
+                // is null and UnloadStreamingAssets would be called, so calling this in that situation could "lock"
+                // the SlideProjectors because (Prev|Next)SlideAvailable() would return false
+                // However, this isn't useful because there's a patch in SlideProjector to load the textures when
+                // interacted because it's still needed (see patch)
                 _reel.UnloadStreamingTextures();
             }
         }
