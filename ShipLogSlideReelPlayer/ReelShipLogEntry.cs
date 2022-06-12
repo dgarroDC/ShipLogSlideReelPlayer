@@ -101,16 +101,16 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        public void CheckRead()
+        public void CheckRead(SlideCollectionContainer realReel)
         {
             if (_state == State.Explored)
             {
                 return;
             }
 
-            for (int i = 0; i < _reel.slideCount; i++)
+            for (int i = 0; i < realReel.slideCount; i++)
             {
-                if (!_reel.IsSlideRead(i))
+                if (!realReel.IsSlideRead(i))
                 {
                     return;
                 }

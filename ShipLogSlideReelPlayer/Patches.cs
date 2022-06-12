@@ -186,7 +186,7 @@ namespace ShipLogSlideReelPlayer
             bool isReelEntry = ShipLogSlideReelPlayer.Instance.ReelEntries.TryGetValue(__instance.name, out ReelShipLogEntry entry);
             if (isReelEntry)
             {
-                entry.CheckRead();
+                entry.CheckRead(__instance);
             }
         }
         
