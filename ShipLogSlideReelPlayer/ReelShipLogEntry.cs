@@ -10,6 +10,7 @@ namespace ShipLogSlideReelPlayer
 
         private SlideCollectionContainer _reel;
         private bool _isVision;
+        private float _defaultSlideDuration;
         private ShipLogEntry _parentEntry;
         private List<string> _overridenByEntries;
 
@@ -27,11 +28,21 @@ namespace ShipLogSlideReelPlayer
                 if (reel.name == _id)
                 {
                     _reel = CopySlideCollectionContainer(reel);
+                    float? defaultSlideDurationForVision = FindDefaultSlideDurationForVision(reel);
+                    if (defaultSlideDurationForVision.HasValue)
+                    {
+                        _isVision = true;
+                        _defaultSlideDuration = defaultSlideDurationForVision.Value;
+                    }
+                    else
+                    {
+                        _isVision = false;
+                        _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
+                    }
                     break;
                 }
             }
 
-            _isVision = (entryNode.Element("DGARRO_ISVISION") != null);
             _parentEntry = parentEntry;
 
             _overridenByEntries = new List<string>();
@@ -66,6 +77,28 @@ namespace ShipLogSlideReelPlayer
             return copy;
         }
 
+        private float? FindDefaultSlideDurationForVision(SlideCollectionContainer reel)
+        {
+            foreach (MindSlideCollection mindSlideCollection in Resources.FindObjectsOfTypeAll<MindSlideCollection>())
+            {
+                if (mindSlideCollection.slideCollectionContainer == reel)   
+                {
+                    return mindSlideCollection.defaultSlideDuration;
+                }
+            }
+            foreach (MindSlideProjector mindSlideProjector in Resources.FindObjectsOfTypeAll<MindSlideProjector>())
+            {
+                if (mindSlideProjector._slideCollectionItem == reel)
+                {
+                    // With need for the Prefab_IP_Reel_TowerVision because it doesn't have a MindSlideCollection,
+                    // although mindSlideProjector._defaultSlideDuration has a Header "Deprecated (use MindSlideCollection instead)"...
+                    return mindSlideProjector._defaultSlideDuration;
+                }
+            }
+
+            return null;
+        }
+
         public static ReelShipLogEntry LoadEntry(string astroObjectID, XElement entryNode, ShipLogManager shipLogManager)
         {
             string parentID = entryNode.Element("DGARRO_PARENT").Value;
@@ -75,7 +108,7 @@ namespace ShipLogSlideReelPlayer
 
         public void PlaceReelOnProjector(ShipLogSlideProjector projector)
         {
-            projector.PlaceReel(_reel, _isVision);
+            projector.PlaceReel(_reel, _isVision, _defaultSlideDuration);
         }
 
         public void LoadStreamingTextures()

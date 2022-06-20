@@ -107,6 +107,7 @@ namespace ShipLogSlideReelPlayer
         public void AddProjector(GameObject image, Action<ScreenPrompt> promptPlacer)
         {
             ShipLogSlideProjector projector = image.AddComponent<ShipLogSlideProjector>();
+            promptPlacer.Invoke(projector._playPrompt);
             promptPlacer.Invoke(projector._forwardPrompt);
             promptPlacer.Invoke(projector._reversePrompt);
             _projectors[image] = projector;
