@@ -108,7 +108,7 @@ namespace ShipLogSlideReelPlayer
 
         public void PlaceReelOnProjector(ShipLogSlideProjector projector)
         {
-            projector.PlaceReel(_reel, _isVision);
+            projector.PlaceReel(_reel, _isVision, _defaultSlideDuration);
         }
 
         public void LoadStreamingTextures()

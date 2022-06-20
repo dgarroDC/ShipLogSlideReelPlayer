@@ -10,7 +10,11 @@ namespace ShipLogSlideReelPlayer
         private SlideCollectionContainer _reel;
         private bool _isVision;
         private bool _playing;
+        private float _defaultSlideDuration;
+        private bool _autoPlaying;
+        private float _lastSlidePlayTime;
 
+        internal ScreenPrompt _playPrompt;
         internal ScreenPrompt _forwardPrompt;
         internal ScreenPrompt _reversePrompt;
 
@@ -24,35 +28,90 @@ namespace ShipLogSlideReelPlayer
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
             // Is this inverted ok for Suit Log?
 
-            _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt) + "   <CMD>");
-            _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt) + "   <CMD>");
+            _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
+            _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
+            _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
         }
         
-        private void Update()   
+        private void Update()
         {
-            if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary))
+            UpdatePromptsVisibility();
+            if (!IsReelPlaced()) return;
+            if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
             {
-                NextSlide();
+                if (!_autoPlaying)
+                {
+                    if (_reel.isEndOfSlide)
+                    {
+                        NextSlide();
+                    }
+                    _autoPlaying = true;
+                    _lastSlidePlayTime = Time.unscaledTime; // unscaled because time could be paused
+                    PlayInitialMusic();
+                }
+                else
+                {
+                    _autoPlaying = false;
+                }
+                return;
             }
-            if (OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary))
+
+            if (_autoPlaying)
             {
-                PreviousSlide();
+                float currentSlidePlayDuration = GetCurrentSlidePlayDuration();
+                if (Time.unscaledTime >= _lastSlidePlayTime + currentSlidePlayDuration)
+                {
+                    if (!_reel.isEndOfSlide)
+                    {
+                        NextSlide();
+                        _lastSlidePlayTime += currentSlidePlayDuration; 
+                        // This doesn't seem right (minimizing game for example) but it's the MindSlideProjector behaviour... 
+                    }
+                    else
+                    {
+                        // mindProjectionComplete is only used in visions so no difference to check if vision
+                        Locator.GetSlideReelMusicManager().OnExitSlideProjector(true);
+                        _autoPlaying = false;
+                    }
+                }
+            }
+            else
+            {
+                if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary) && _reel.NextSlideAvailable())
+                {
+                    NextSlide();
+                }
+                if (OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary) && _reel.PrevSlideAvailable())
+                {
+                    PreviousSlide();
+                }
             }
         }
 
-        public void PlaceReel(SlideCollectionContainer reel, bool isVision)
+        private void UpdatePromptsVisibility()
+        {
+            _playPrompt.SetVisibility(IsReelPlaced());
+            _playPrompt.SetText(_autoPlaying ? "Stop" : "Play");
+            _forwardPrompt.SetVisibility(IsReelPlaced() && !_autoPlaying);
+            _reversePrompt.SetVisibility(IsReelPlaced() && !_autoPlaying);
+        }
+
+        public void PlaceReel(SlideCollectionContainer reel, bool isVision, float defaultSlideDuration)
         {
             _reel = reel;
             _isVision = isVision;
+            _defaultSlideDuration = defaultSlideDuration;
             reel.onSlideTextureUpdated += OnSlideTextureUpdated;
             reel.onPlayBeatAudio += OnPlayBeatAudio;
             reel.ResetSlideIndex();
             reel.enabled = true;
             OnSlideTextureUpdated();
             _playing = false;
+            _autoPlaying = false;
 
             _forwardPrompt.SetVisibility(true);
             _reversePrompt.SetVisibility(true);
+            _playPrompt.SetVisibility(true);
 
             if (!_isVision)
             {
@@ -85,6 +144,7 @@ namespace ShipLogSlideReelPlayer
 
                 _forwardPrompt.SetVisibility(false);
                 _reversePrompt.SetVisibility(false);
+                _playPrompt.SetVisibility(false);
             }
         }
   
@@ -106,43 +166,60 @@ namespace ShipLogSlideReelPlayer
             Locator.GetSlideReelMusicManager().PlayBeat(audioType, _isVision);
         }
 
-        public bool IsReelPlaced()
+        private bool IsReelPlaced()
         {
             return _reel != null;
         }
 
-        public void NextSlide() 
+        private void NextSlide()
         {
-            if (IsReelPlaced() && _reel.NextSlideAvailable())
+            // Force start the music of the first slide, don't do this on place reel, that would be annoying
+            PlayInitialMusic();
+            if (_reel.isEndOfSlide)
             {
-                if (!_playing)
-                {
-                    _playing = true;
-                    // Force start the music of the first slide, don't do this on place reel, that would be annoying
-                    // This is for beats (My Vision and Farewell Vision only)
-                    _reel.ForceCurrentSlideDisplayEvent(true);
-                    // This is for backdrops (all other visions and Hull Breach Reel only)
-                    _reel.TryPlayMusicForCurrentSlideInclusive();
-                } else if (_reel.slideIndex == _reel.slideCount -1)
-                {
-                    // Avoid annoying overlap of music (My Vision and Farewall Vision)
-                    Locator.GetSlideReelMusicManager().StopAllBeatSources(0.5f);
-                }
-                _reel.IncreaseSlideIndex();
-                _reel.TryPlayMusicForCurrentSlideTransition(true);
+                // Avoid annoying overlap of music (My Vision and Farewall Vision)
+                Locator.GetSlideReelMusicManager().StopAllBeatSources(0.5f);
             }
+            _reel.IncreaseSlideIndex();
+            _reel.TryPlayMusicForCurrentSlideTransition(true);
         }
-        public void PreviousSlide()
+
+        private void PlayInitialMusic()
         {
-            if (IsReelPlaced() && _reel.PrevSlideAvailable())
+            if (_playing) return;
+            _playing = true;
+            // This is for beats (My Vision and Farewell Vision only)
+            _reel.ForceCurrentSlideDisplayEvent(true);
+            // This is for backdrops (all other visions and Hull Breach Reel only)
+            _reel.TryPlayMusicForCurrentSlideInclusive();
+        }
+        
+        private float GetCurrentSlidePlayDuration()
+        {
+            // Copied from (Mind|Auto)SlideProjector
+            float duration = 0f;
+            Slide currentSlide = _reel.GetCurrentSlide();
+            SlideBlackFrameModule blackFrameModule = currentSlide.GetModule<SlideBlackFrameModule>();
+            if (blackFrameModule != null)
             {
-                if (!_playing)
-                {
-                    _playing = true;
-                }
-                _reel.DecreaseSlideIndex();
-                _reel.TryPlayMusicForCurrentSlideTransition(false);
+                duration = blackFrameModule._duration; // It seems this isn't used in vanilla, but idk
             }
+            SlidePlayTimeModule playTimeModule = currentSlide.GetModule<SlidePlayTimeModule>();
+            if (playTimeModule != null)
+            {
+                return playTimeModule._duration + duration;
+            }
+            return _defaultSlideDuration + duration;
+        }
+
+        private void PreviousSlide()
+        {
+            if (!_playing)
+            {
+                _playing = true;
+            }
+            _reel.DecreaseSlideIndex();
+            _reel.TryPlayMusicForCurrentSlideTransition(false);
         }
 
         public void RestoreOriginalMaterial()
