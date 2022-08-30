@@ -10,6 +10,11 @@ public class ReelPlayerAPI : IReelPlayerAPI
         ShipLogSlideReelPlayer.Instance.AddProjector(image, promptPlacer);
     }
 
+    public void SetDescriptionFieldItemSupplier(GameObject image, Func<ShipLogFactListItem> supplier)
+    {
+        ShipLogSlideReelPlayer.Instance.SetDescriptionFieldItemSupplier(image, supplier);
+    }
+
     public void SelectEntry(GameObject image, Func<int, ShipLogEntry> indexToEntry, int index, int entryCount)
     {
         ShipLogSlideReelPlayer.Instance.SelectEntry(image, indexToEntry, index, entryCount);
