@@ -26,7 +26,7 @@ public class SlideReelPlayerMode : ShipLogMode
 
         itemList.SetName(Name);
 
-        itemList.GetQuestionMark().text = ReelShipLogEntry.WithColor("?");
+        itemList.GetQuestionMark().text = ShipLogSlideReelPlayer.WithGreenColor("?");
         
         _reelProjector = new ShipLogSlideProjectorPlus(itemList.GetPhoto(), _upperRightPromptList);
     }
@@ -74,6 +74,7 @@ public class SlideReelPlayerMode : ShipLogMode
     {
         int selectedIndex = itemList.GetSelectedIndex();
         itemList.DescriptionFieldClear();
+        _reelProjector.DescriptionFieldItem = itemList.DescriptionFieldGetNextItem(); // This is always the first, could be just be set once?
         if (_reels[selectedIndex].HasMoreToExplore())
         {
             // TODO: Translation

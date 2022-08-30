@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using Unity.Jobs;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
     public class ShipLogSlideProjectorPlus
     {
+        public ShipLogFactListItem DescriptionFieldItem;
+
         private Image _photo;
         private SlideCollectionContainer _reel;
         private bool _isVision;
@@ -91,6 +94,28 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
+        private void UpdateSlideCounter()
+        {
+            string progressBar = "[";
+            int index = _reel.slideIndex;
+            int count = _reel.slideCount;
+            for (int i = 0; i < count; i++)
+            {
+                if (i == index)
+                {
+                    progressBar += "*";
+                }
+                else
+                {
+                    progressBar += "=";
+                }
+            }
+            progressBar += "]";
+            progressBar = ShipLogSlideReelPlayer.WithGreenColor(progressBar);
+            string counter = $"{index + 1}/{count}";
+            DescriptionFieldItem.DisplayText($"{progressBar} {counter}");
+        }
+
         private void UpdatePromptsVisibility()
         { 
             _playPrompt.SetText(_autoPlaying ? "Stop" : "Play");
@@ -140,6 +165,8 @@ namespace ShipLogSlideReelPlayer
             {
                 RestoreOriginalMaterial();
             }
+
+            UpdateSlideCounter();
         }
 
         public void RemoveReel()
@@ -193,6 +220,8 @@ namespace ShipLogSlideReelPlayer
             }
             _reel.IncreaseSlideIndex();
             _reel.TryPlayMusicForCurrentSlideTransition(true);
+
+            UpdateSlideCounter();
         }
 
         private void PlayInitialMusic()
@@ -231,6 +260,8 @@ namespace ShipLogSlideReelPlayer
             }
             _reel.DecreaseSlideIndex();
             _reel.TryPlayMusicForCurrentSlideTransition(false);
+
+            UpdateSlideCounter();
         }
 
         public void RestoreOriginalMaterial()

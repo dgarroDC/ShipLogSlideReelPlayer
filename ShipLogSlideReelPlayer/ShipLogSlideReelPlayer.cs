@@ -78,5 +78,10 @@ namespace ShipLogSlideReelPlayer
                 entry.UnloadStreamingTextures();
             }
         }
+
+        public static string WithGreenColor(string text)
+        {
+            return "<color=#90FEF3>" + text + "</color>";
+        }
     }
 }
