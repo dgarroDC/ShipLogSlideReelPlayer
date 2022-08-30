@@ -14,7 +14,7 @@ namespace ShipLogSlideReelPlayer
     {
         public static ShipLogSlideReelPlayer Instance;
 
-        private Dictionary<GameObject, ShipLogSlideProjector> _projectors;
+        internal Dictionary<GameObject, ShipLogSlideProjector> _projectors;
 
         public Dictionary<string, ReelShipLogEntry> ReelEntries;
         public Shader evilShader;
@@ -111,6 +111,11 @@ namespace ShipLogSlideReelPlayer
             promptPlacer.Invoke(projector._forwardPrompt);
             promptPlacer.Invoke(projector._reversePrompt);
             _projectors[image] = projector;
+        }
+
+        public void SetDescriptionFieldItemSupplier(GameObject image, Func<ShipLogFactListItem> supplier)
+        {
+            _projectors[image].SetDescriptionFieldItemSupplier(supplier);
         }
 
         public void SelectEntry(GameObject image, Func<int, ShipLogEntry> indexToEntry, int index, int entryCount)

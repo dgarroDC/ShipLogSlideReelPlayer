@@ -151,6 +151,11 @@ namespace ShipLogSlideReelPlayer
             Action<ScreenPrompt> promptPlacer = prompt => 
                 Locator.GetPromptManager().AddScreenPrompt(prompt, __instance._upperRightPromptList, TextAnchor.MiddleRight);
             ShipLogSlideReelPlayer.Instance.AddProjector(mapModePhoto, promptPlacer);
+            ShipLogSlideReelPlayer.Instance.SetDescriptionFieldItemSupplier(mapModePhoto, () =>
+            {
+                var shipLogEntryDescriptionField = __instance._descriptionField;
+                return shipLogEntryDescriptionField._factListItems[shipLogEntryDescriptionField._displayCount++];
+            });
         }
         
         [HarmonyPostfix]

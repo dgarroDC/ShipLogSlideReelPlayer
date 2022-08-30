@@ -13,6 +13,9 @@ namespace ShipLogSlideReelPlayer
         private float _defaultSlideDuration;
         private bool _autoPlaying;
         private float _lastSlidePlayTime;
+        
+        private Func<ShipLogFactListItem> descriptionFieldItemSupplier;
+        private ShipLogFactListItem descriptionFieldItem;
 
         internal ScreenPrompt _playPrompt;
         internal ScreenPrompt _forwardPrompt;
@@ -88,6 +91,39 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
+        public void SetDescriptionFieldItemSupplier(Func<ShipLogFactListItem> supplier)
+        {
+            descriptionFieldItemSupplier = supplier;
+        }
+
+        private void UpdateSlideCounter()
+        {
+            if (descriptionFieldItem == null)
+            {
+                if (descriptionFieldItemSupplier == null)
+                {
+                    return;
+                }
+
+                descriptionFieldItem = descriptionFieldItemSupplier.Invoke();
+            }
+
+            string progressBar = "[";
+            for (int i = 0; i < _reel.slideCount; i++)
+            {
+                if (i == _reel.slideIndex)
+                {
+                    progressBar += "*";
+                }
+                else
+                {
+                    progressBar += "=";
+                }
+            }
+            progressBar += "]";
+            descriptionFieldItem.DisplayText($"{progressBar} {_reel.slideIndex + 1}/{_reel.slideCount}");
+        }
+
         private void UpdatePromptsVisibility()
         {
             _playPrompt.SetVisibility(IsReelPlaced());
@@ -125,6 +161,10 @@ namespace ShipLogSlideReelPlayer
             {
                 RestoreOriginalMaterial();
             }
+
+            // A new items needs to be added, the number of items could vary because some reels have the "HasMoreToExplore"
+            descriptionFieldItem = null;
+            UpdateSlideCounter();
         }
 
         public void RemoveReel()
@@ -182,6 +222,8 @@ namespace ShipLogSlideReelPlayer
             }
             _reel.IncreaseSlideIndex();
             _reel.TryPlayMusicForCurrentSlideTransition(true);
+
+            UpdateSlideCounter();
         }
 
         private void PlayInitialMusic()
@@ -220,6 +262,8 @@ namespace ShipLogSlideReelPlayer
             }
             _reel.DecreaseSlideIndex();
             _reel.TryPlayMusicForCurrentSlideTransition(false);
+
+            UpdateSlideCounter();
         }
 
         public void RestoreOriginalMaterial()
