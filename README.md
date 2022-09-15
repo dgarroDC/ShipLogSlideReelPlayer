@@ -1,3 +1,12 @@
+
+# ⚠️ IMPORTANT NOTICE ⚠️
+
+This mod was removed from the [Outer Wilds Mods Database](https://github.com/ow-mods/ow-mod-db) since [Outer Wilds Patch 13](https://www.mobiusdigitalgames.com/news/patch-13-is-now-available) was released because that update officially implemented watching slide shows in the sip log ("Playing Echoes of the Eye no longer requires a photographic memory") and the mod doesn't work anymore.
+
+If for some reason you are playing an older version of the game you still may [download this mod](https://github.com/dgarroDC/ShipLogSlideReelPlayer/releases/tag/1.2.0).
+
+I may update this mod to make it upgrade the official feature with the feature this mod had (music, color, the possibility to manually change slides instead of only playing it automatically), but that would require some work because the patch changed a lot of things.
+
 # Ship Log Slide Reel Player by Damián Garro
 
 Play Echoes of the Eye slide reels in your ship log computer!
