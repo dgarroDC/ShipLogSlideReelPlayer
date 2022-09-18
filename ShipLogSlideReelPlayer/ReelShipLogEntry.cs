@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Xml.Linq;
 using System.Collections.Generic;
 
@@ -61,7 +62,9 @@ namespace ShipLogSlideReelPlayer
             copy._autoLoadStreaming = original._autoLoadStreaming;
             copy._invertBlackFrames = original._invertBlackFrames; // Probably unused
             copy._slideCollection = CopySlideCollection(original._slideCollection);
-            
+            copy._playWithShipLogFacts = Array.Empty<string>(); 
+            // TODO: Use original._playWithShipLogFacts but leave copy._playWithShipLogFacts empty, so we don't call RegisterSlideCollection (ours doesn't have the _isVision field because I don't want to use _owningItem or patch SlideCollectionContainer.Initialize)
+
             return copy;
         }
 
@@ -106,7 +109,7 @@ namespace ShipLogSlideReelPlayer
             return new ReelShipLogEntry(astroObjectID, entryNode, parentEntry);
         }
 
-        public void PlaceReelOnProjector(ShipLogSlideProjector projector)
+        public void PlaceReelOnProjector(ShipLogSlideProjectorPlus projector)
         {
             projector.PlaceReel(_reel, _isVision, _defaultSlideDuration);
         }

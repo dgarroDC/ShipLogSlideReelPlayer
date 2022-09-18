@@ -14,7 +14,7 @@ namespace ShipLogSlideReelPlayer
     {
         public static ShipLogSlideReelPlayer Instance;
 
-        private Dictionary<GameObject, ShipLogSlideProjector> _projectors;
+        private Dictionary<GameObject, ShipLogSlideProjectorPlus> _projectors;
 
         public Dictionary<string, ReelShipLogEntry> ReelEntries;
         public Shader evilShader;
@@ -33,7 +33,7 @@ namespace ShipLogSlideReelPlayer
 
         private void OnCompleteSceneLoad(OWScene scene, OWScene loadScene)
         {
-            _projectors = new Dictionary<GameObject, ShipLogSlideProjector>();
+            _projectors = new Dictionary<GameObject, ShipLogSlideProjectorPlus>();
         }
 
         public override void Configure(IModConfig config)
@@ -106,7 +106,7 @@ namespace ShipLogSlideReelPlayer
 
         public void AddProjector(GameObject image, Action<ScreenPrompt> promptPlacer)
         {
-            ShipLogSlideProjector projector = image.AddComponent<ShipLogSlideProjector>();
+            ShipLogSlideProjectorPlus projector = image.AddComponent<ShipLogSlideProjectorPlus>();
             promptPlacer.Invoke(projector._playPrompt);
             promptPlacer.Invoke(projector._forwardPrompt);
             promptPlacer.Invoke(projector._reversePrompt);
@@ -120,7 +120,7 @@ namespace ShipLogSlideReelPlayer
 
         public void Close(GameObject image, bool restoreOriginalMaterial)
         {
-            ShipLogSlideProjector projector = _projectors[image];
+            ShipLogSlideProjectorPlus projector = _projectors[image];
             projector.RemoveReel();
             if (restoreOriginalMaterial)
             {

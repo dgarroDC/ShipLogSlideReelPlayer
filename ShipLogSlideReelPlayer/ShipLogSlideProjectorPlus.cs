@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
-    public class ShipLogSlideProjector : MonoBehaviour
+    public class ShipLogSlideProjectorPlus : MonoBehaviour
     {
         private Image _photo;
         private SlideCollectionContainer _reel;
@@ -21,7 +21,7 @@ namespace ShipLogSlideReelPlayer
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
 
-        public ShipLogSlideProjector()
+        public ShipLogSlideProjectorPlus()
         {
             _photo = GetComponent<Image>();
             _originalPhotoMaterial = _photo.material;
