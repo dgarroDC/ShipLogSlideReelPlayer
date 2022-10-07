@@ -16,7 +16,8 @@ namespace ShipLogSlideReelPlayer
         private ShipLogEntry _parentEntry;
         private List<string> _overridenByEntries;
 
-        private ReelShipLogEntry(string astroObjectID, XElement entryNode, ShipLogEntry parentEntry) : base(astroObjectID, entryNode, parentEntry.GetID())
+        public ReelShipLogEntry(string astroObjectID, XElement entryNode, ShipLogManager shipLogManager) :
+            base(astroObjectID, entryNode, entryNode.Element("DGARRO_PARENT").Value)
         { 
             string[] playWithShipLogFacts = null;
 
@@ -41,7 +42,7 @@ namespace ShipLogSlideReelPlayer
                 }
             }
 
-            _parentEntry = parentEntry;
+            _parentEntry = shipLogManager.GetEntry(_parentID);
 
             _overridenByEntries = new List<string>();
             foreach (XElement overridenByEntry in entryNode.Elements("DGARRO_OVERRIDEN"))
@@ -49,10 +50,10 @@ namespace ShipLogSlideReelPlayer
                 _overridenByEntries.Add(overridenByEntry.Value);
             }
  
-            InitState(playWithShipLogFacts);
+            InitState(playWithShipLogFacts, shipLogManager);
         }
 
-        private void InitState(string[] playWithShipLogFacts)
+        private void InitState(string[] playWithShipLogFacts, ShipLogManager shipLogManager)
         {
             _state = State.Hidden;
             // The reel entries are created when a game is loaded, so it's ok to do this
@@ -62,7 +63,7 @@ namespace ShipLogSlideReelPlayer
                 return;
             }
 
-            if (!playWithShipLogFacts.Any(factID => Locator.GetShipLogManager().IsFactRevealed(factID))) return;
+            if (!playWithShipLogFacts.Any(factID => shipLogManager.IsFactRevealed(factID))) return;
             _state = State.Explored;
             // Save even the ones with playWithShipLogFacts not empty, just in case
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
@@ -116,13 +117,6 @@ namespace ShipLogSlideReelPlayer
             }
 
             return null;
-        }
-
-        public static ReelShipLogEntry LoadEntry(string astroObjectID, XElement entryNode, ShipLogManager shipLogManager)
-        {
-            string parentID = entryNode.Element("DGARRO_PARENT").Value;
-            ShipLogEntry parentEntry = shipLogManager.GetEntry(parentID);
-            return new ReelShipLogEntry(astroObjectID, entryNode, parentEntry);
         }
 
         public void PlaceReelOnProjector(ShipLogSlideProjectorPlus projector)

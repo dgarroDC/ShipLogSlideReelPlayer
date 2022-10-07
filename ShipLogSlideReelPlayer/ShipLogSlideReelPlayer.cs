@@ -42,7 +42,7 @@ namespace ShipLogSlideReelPlayer
             string astroObjectID = xelement.Element("ID").Value;
             foreach (XElement entryNode in xelement.Elements("Entry"))
             {
-                ReelShipLogEntry entry = ReelShipLogEntry.LoadEntry(astroObjectID, entryNode, shipLogManager);
+                ReelShipLogEntry entry = new ReelShipLogEntry(astroObjectID, entryNode, shipLogManager);
                 ReelEntries.Add(entry.GetID(), entry);
             }
         }
