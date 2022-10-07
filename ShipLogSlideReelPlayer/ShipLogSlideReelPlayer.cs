@@ -19,7 +19,6 @@ namespace ShipLogSlideReelPlayer
         public Dictionary<string, ReelShipLogEntry> ReelEntries;
         public Shader evilShader;
 
-        public bool modEnabled;
         public bool showAll;
 
         private void Start()
@@ -38,7 +37,6 @@ namespace ShipLogSlideReelPlayer
 
         public override void Configure(IModConfig config)
         {
-            modEnabled = config.Enabled;
             showAll = config.GetSettingsValue<bool>("Show all reels (WARNING: SPOILERS)");
         }
 

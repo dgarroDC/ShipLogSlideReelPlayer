@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Xml.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipLogSlideReelPlayer
 {
@@ -16,19 +17,15 @@ namespace ShipLogSlideReelPlayer
         private List<string> _overridenByEntries;
 
         private ReelShipLogEntry(string astroObjectID, XElement entryNode, ShipLogEntry parentEntry) : base(astroObjectID, entryNode, parentEntry.GetID())
-        {
-            _state = State.Hidden;
-            // The reel entries are created when a game is loaded, so it's ok to do this
-            if (PlayerData.GetPersistentCondition(GetReadCondition()))
-            {
-                _state = State.Explored;
-            }
+        { 
+            string[] playWithShipLogFacts = null;
 
             foreach (SlideCollectionContainer reel in Resources.FindObjectsOfTypeAll<SlideCollectionContainer>())
             {
                 if (reel.name == _id)
                 {
                     _reel = CopySlideCollectionContainer(reel);
+                    playWithShipLogFacts = reel._playWithShipLogFacts;
                     float? defaultSlideDurationForVision = FindDefaultSlideDurationForVision(reel);
                     if (defaultSlideDurationForVision.HasValue)
                     {
@@ -51,6 +48,24 @@ namespace ShipLogSlideReelPlayer
             {
                 _overridenByEntries.Add(overridenByEntry.Value);
             }
+ 
+            InitState(playWithShipLogFacts);
+        }
+
+        private void InitState(string[] playWithShipLogFacts)
+        {
+            _state = State.Hidden;
+            // The reel entries are created when a game is loaded, so it's ok to do this
+            if (PlayerData.GetPersistentCondition(GetReadCondition()))
+            {
+                _state = State.Explored;
+                return;
+            }
+
+            if (!playWithShipLogFacts.Any(factID => Locator.GetShipLogManager().IsFactRevealed(factID))) return;
+            _state = State.Explored;
+            // Save even the ones with playWithShipLogFacts not empty, just in case
+            PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
 
         private SlideCollectionContainer CopySlideCollectionContainer(SlideCollectionContainer original)
@@ -63,7 +78,8 @@ namespace ShipLogSlideReelPlayer
             copy._invertBlackFrames = original._invertBlackFrames; // Probably unused
             copy._slideCollection = CopySlideCollection(original._slideCollection);
             copy._playWithShipLogFacts = Array.Empty<string>(); 
-            // TODO: Use original._playWithShipLogFacts but leave copy._playWithShipLogFacts empty, so we don't call RegisterSlideCollection (ours doesn't have the _isVision field because I don't want to use _owningItem or patch SlideCollectionContainer.Initialize)
+            // Leave copy._playWithShipLogFacts empty, so we don't call RegisterSlideCollection
+            // (ours doesn't have the _isVision field because I don't want to use _owningItem or patch SlideCollectionContainer.Initialize)
 
             return copy;
         }
@@ -173,10 +189,6 @@ namespace ShipLogSlideReelPlayer
 
         public new State GetState()
         {
-            if (!ShipLogSlideReelPlayer.Instance.modEnabled)
-            {
-                return State.Hidden;
-            }
             if (ShipLogSlideReelPlayer.Instance.showAll)
             {
                 return State.Explored;
