@@ -26,7 +26,6 @@ namespace ShipLogSlideReelPlayer
             _photo = GetComponent<Image>();
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
-            // Is this inverted ok for Suit Log?
 
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
@@ -230,10 +229,10 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        public void OnEntrySelected(Func<int, ShipLogEntry> indexToEntry, int index, int entryCount)
+        public void OnEntrySelected(ShipLogEntryListItem[] entries, int index, int entryCount)
         {
             RemoveReel();
-            ShipLogEntry entry = indexToEntry.Invoke(index);
+            ShipLogEntry entry = entries[index].GetEntry();
             if (entry is ReelShipLogEntry reelEntry)
             {
                 // Loading the textures is probably only necessary in case no real entries are revealed,
@@ -252,7 +251,7 @@ namespace ShipLogSlideReelPlayer
             // Load textures of neighbors to avoid delay with white photo when displaying the entry
             if (entryCount >= 2)
             {
-                ShipLogEntry prevEntry = indexToEntry.Invoke(Mod(index - 1, entryCount));
+                ShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)].GetEntry();
                 if (prevEntry is ReelShipLogEntry prevReelEntry)
                 {
                     prevReelEntry.LoadStreamingTextures();
@@ -260,7 +259,7 @@ namespace ShipLogSlideReelPlayer
 
                 if (entryCount >= 3)
                 {
-                    ShipLogEntry nextEntry = indexToEntry.Invoke(Mod(index + 1, entryCount));
+                    ShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)].GetEntry();
                     if (nextEntry is ReelShipLogEntry nextReelEntry)
                     {
                         nextReelEntry.LoadStreamingTextures();

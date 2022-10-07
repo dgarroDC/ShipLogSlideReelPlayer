@@ -14,7 +14,7 @@ namespace ShipLogSlideReelPlayer
     {
         public static ShipLogSlideReelPlayer Instance;
 
-        private Dictionary<GameObject, ShipLogSlideProjectorPlus> _projectors;
+        private static ShipLogSlideProjectorPlus _reelProjector;
 
         public Dictionary<string, ReelShipLogEntry> ReelEntries;
         public Shader evilShader;
@@ -27,22 +27,11 @@ namespace ShipLogSlideReelPlayer
             AssetBundle bundle = ModHelper.Assets.LoadBundle("Assets/evilshader");
             evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-            LoadManager.OnCompleteSceneLoad += OnCompleteSceneLoad;
-        }
-
-        private void OnCompleteSceneLoad(OWScene scene, OWScene loadScene)
-        {
-            _projectors = new Dictionary<GameObject, ShipLogSlideProjectorPlus>();
         }
 
         public override void Configure(IModConfig config)
         {
             showAll = config.GetSettingsValue<bool>("Show all reels (WARNING: SPOILERS)");
-        }
-
-        public override object GetApi()
-        {
-            return new ReelPlayerAPI();
         }
 
         internal void LoadReelEntries(ShipLogManager shipLogManager)
@@ -58,7 +47,7 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        internal void AddMoreEntryListItems(ShipLogMapMode mapMode)
+        internal void AddMoreEntryListItemsAndCreateProjector(ShipLogMapMode mapMode)
         {
             // The 32 items aren't enough after adding the reel entries
             int prevSize = mapMode._listItems.Length;
@@ -73,6 +62,11 @@ namespace ShipLogSlideReelPlayer
                 mapMode._listItems[i] = newItem.GetComponent<ShipLogEntryListItem>();
                 mapMode._listItems[i].Init(mapMode._fontAndLanguageController);
             }
+            
+            _reelProjector = mapMode._photo.gameObject.AddComponent<ShipLogSlideProjectorPlus>();
+            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._playPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._forwardPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._reversePrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
         }
 
         public bool HasAncestor(ShipLogEntry entry, string ancestor)
@@ -98,33 +92,18 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        // ===
-        // API 
-        // ===
-
-        public void AddProjector(GameObject image, Action<ScreenPrompt> promptPlacer)
+        public void OnEntrySelected(ShipLogMapMode mapMode)
         {
-            ShipLogSlideProjectorPlus projector = image.AddComponent<ShipLogSlideProjectorPlus>();
-            promptPlacer.Invoke(projector._playPrompt);
-            promptPlacer.Invoke(projector._forwardPrompt);
-            promptPlacer.Invoke(projector._reversePrompt);
-            _projectors[image] = projector;
+            _reelProjector.OnEntrySelected(mapMode._listItems, mapMode._entryIndex, mapMode._maxIndex + 1);
         }
 
-        public void SelectEntry(GameObject image, Func<int, ShipLogEntry> indexToEntry, int index, int entryCount)
+        public void Close()
         {
-            _projectors[image].OnEntrySelected(indexToEntry, index, entryCount);
-        }
-
-        public void Close(GameObject image, bool restoreOriginalMaterial)
-        {
-            ShipLogSlideProjectorPlus projector = _projectors[image];
-            projector.RemoveReel();
-            if (restoreOriginalMaterial)
-            {
-                projector.RestoreOriginalMaterial();
-            }
+            _reelProjector.RemoveReel();
+            // We want to stop the music but we don't want to restore material (see comment in OnEntrySelected)
             UnloadAllTextures();
+            // Note: Texture aren't unloaded while the game is paused (StreamingIteratedTextureAssetBundle.Update())
+            // textured unloaded by updating slide index are, meaning that up to 5*#Reels textures could be loaded
         }
     }
 }

@@ -173,7 +173,7 @@ namespace ShipLogSlideReelPlayer
 
         public new string GetName(bool withLineBreaks)
         {
-            // Color is added here to make it easier to Suit Log
+            // Color is added here to make it easier to Suit Log (not anymore tho)
             return "<color=#90FEF3>" + _name + "</color>";
         }
 
