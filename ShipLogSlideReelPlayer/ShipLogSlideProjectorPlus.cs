@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
-    public class ShipLogSlideProjectorPlus : MonoBehaviour
+    public class ShipLogSlideProjectorPlus
     {
         private Image _photo;
         private SlideCollectionContainer _reel;
@@ -14,25 +14,29 @@ namespace ShipLogSlideReelPlayer
         private bool _autoPlaying;
         private float _lastSlidePlayTime;
 
-        internal ScreenPrompt _playPrompt;
-        internal ScreenPrompt _forwardPrompt;
-        internal ScreenPrompt _reversePrompt;
+        private ScreenPrompt _playPrompt;
+        private ScreenPrompt _forwardPrompt;
+        private ScreenPrompt _reversePrompt;
 
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
 
-        public ShipLogSlideProjectorPlus()
+        public ShipLogSlideProjectorPlus(ShipLogMapMode mapMode)
         {
-            _photo = GetComponent<Image>();
+            _photo = mapMode._photo;
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
+            
+            Locator.GetPromptManager().AddScreenPrompt(_playPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_forwardPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_reversePrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
         }
         
-        private void Update()
+        public void Update()
         {
             UpdatePromptsVisibility();
             if (!IsReelPlaced()) return;

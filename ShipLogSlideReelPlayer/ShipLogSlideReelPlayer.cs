@@ -34,6 +34,11 @@ namespace ShipLogSlideReelPlayer
             showAll = config.GetSettingsValue<bool>("Show all reels (WARNING: SPOILERS)");
         }
 
+        private void Update()
+        {
+            _reelProjector?.Update();
+        }
+
         internal void LoadReelEntries(ShipLogManager shipLogManager)
         {
             ReelEntries = new Dictionary<string, ReelShipLogEntry>();
@@ -63,10 +68,7 @@ namespace ShipLogSlideReelPlayer
                 mapMode._listItems[i].Init(mapMode._fontAndLanguageController);
             }
             
-            _reelProjector = mapMode._photo.gameObject.AddComponent<ShipLogSlideProjectorPlus>();
-            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._playPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._forwardPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_reelProjector._reversePrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            _reelProjector = new ShipLogSlideProjectorPlus(mapMode);
         }
 
         public bool HasAncestor(ShipLogEntry entry, string ancestor)
