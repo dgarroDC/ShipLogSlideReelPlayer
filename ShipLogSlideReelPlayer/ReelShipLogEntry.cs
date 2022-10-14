@@ -33,24 +33,6 @@ namespace ShipLogSlideReelPlayer
                 _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
             }
 
-            float? foundDuration = FindDefaultSlideDurationForVision(reel);
-            if (foundDuration.HasValue)
-            {
-                if (!_isVision)
-                {
-                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(reel.name + " has not duration but found with duration " + foundDuration);
-                }
-                else if (foundDuration != _defaultSlideDuration)
-                {
-                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(reel.name + " has wrong duration " + _defaultSlideDuration  
-                    + " instead of found one " + foundDuration);
-                }
-            }
-            else if (_isVision)
-            {
-                ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(reel.name + " has duration but duration wasn't found");
-            }
-
             _parentEntry = shipLogManager.GetEntry(_parentID);
 
             _overridenByEntries = new List<string>();
@@ -104,28 +86,6 @@ namespace ShipLogSlideReelPlayer
             }
 
             return copy;
-        }
-
-        private float? FindDefaultSlideDurationForVision(SlideCollectionContainer reel)
-        {
-            foreach (MindSlideCollection mindSlideCollection in Resources.FindObjectsOfTypeAll<MindSlideCollection>())
-            {
-                if (mindSlideCollection.slideCollectionContainer == reel)   
-                {
-                    return mindSlideCollection.defaultSlideDuration;
-                }
-            }
-            foreach (MindSlideProjector mindSlideProjector in Resources.FindObjectsOfTypeAll<MindSlideProjector>())
-            {
-                if (mindSlideProjector._slideCollectionItem == reel)
-                {
-                    // With need for the Prefab_IP_Reel_TowerVision because it doesn't have a MindSlideCollection,
-                    // although mindSlideProjector._defaultSlideDuration has a Header "Deprecated (use MindSlideCollection instead)"...
-                    return mindSlideProjector._defaultSlideDuration;
-                }
-            }
-
-            return null;
         }
 
         public void PlaceReelOnProjector(ShipLogSlideProjectorPlus projector)

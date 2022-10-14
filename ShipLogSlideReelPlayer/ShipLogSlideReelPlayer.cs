@@ -44,30 +44,26 @@ namespace ShipLogSlideReelPlayer
         {
             ReelEntries = new Dictionary<string, ReelShipLogEntry>();
             string entriesFileData = File.ReadAllText(ModHelper.Manifest.ModFolderPath + "ReelEntries.xml");
-            XElement xelement = XDocument.Parse(entriesFileData).Element("AstroObjectEntry");
-            string astroObjectID = xelement.Element("ID").Value;
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            XElement astroElement = XDocument.Parse(entriesFileData).Element("AstroObjectEntry");
+            string astroObjectID = astroElement!.Element("ID")!.Value;
             SlideCollectionContainer[] existingReels = Resources.FindObjectsOfTypeAll<SlideCollectionContainer>();
-            foreach (XElement entryNode in xelement.Elements("Entry"))
+            foreach (XElement entryNode in astroElement.Elements("Entry"))
             {
-                string name = entryNode.Element("ID")!.Value;
-                SlideCollectionContainer[] foundReels = existingReels.Where(reel => reel.name == name).ToArray();
+                string reelName = entryNode.Element("ID")!.Value;
+                SlideCollectionContainer[] foundReels = existingReels.Where(reel => reel.name == reelName).ToArray();
                 if (foundReels.Length == 0)
                 {
-                    ModHelper.Console.WriteLine("Reel with name " + name + " not found!", MessageType.Error);
+                    ModHelper.Console.WriteLine("Reel with name " + reelName + " not found!", MessageType.Error);
                     continue;
                 }
-
                 if (foundReels.Length > 1)
                 {
-                    ModHelper.Console.WriteLine("Multiple (" + foundReels.Length + ") reels with name " + name + " found, defaulting to the first one...",
+                    ModHelper.Console.WriteLine("Multiple (" + foundReels.Length + ") reels with name " + reelName + " found, defaulting to the first one...",
                         MessageType.Error);
                 }
                 ReelShipLogEntry entry = new ReelShipLogEntry(astroObjectID, entryNode, foundReels[0], shipLogManager);
                 ReelEntries.Add(entry.GetID(), entry);
             }
-            watch.Stop();
-            ModHelper.Console.WriteLine("TIME IN MS: " + watch.ElapsedMilliseconds);
         }
 
         internal void AddMoreEntryListItemsAndCreateProjector(ShipLogMapMode mapMode)
