@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.IO;
 using System;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 
@@ -45,11 +46,28 @@ namespace ShipLogSlideReelPlayer
             string entriesFileData = File.ReadAllText(ModHelper.Manifest.ModFolderPath + "ReelEntries.xml");
             XElement xelement = XDocument.Parse(entriesFileData).Element("AstroObjectEntry");
             string astroObjectID = xelement.Element("ID").Value;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            SlideCollectionContainer[] existingReels = Resources.FindObjectsOfTypeAll<SlideCollectionContainer>();
             foreach (XElement entryNode in xelement.Elements("Entry"))
             {
-                ReelShipLogEntry entry = new ReelShipLogEntry(astroObjectID, entryNode, shipLogManager);
+                string name = entryNode.Element("ID")!.Value;
+                SlideCollectionContainer[] foundReels = existingReels.Where(reel => reel.name == name).ToArray();
+                if (foundReels.Length == 0)
+                {
+                    ModHelper.Console.WriteLine("Reel with name " + name + " not found!", MessageType.Error);
+                    continue;
+                }
+
+                if (foundReels.Length > 1)
+                {
+                    ModHelper.Console.WriteLine("Multiple (" + foundReels.Length + ") reels with name " + name + " found, defaulting to the first one...",
+                        MessageType.Error);
+                }
+                ReelShipLogEntry entry = new ReelShipLogEntry(astroObjectID, entryNode, foundReels[0], shipLogManager);
                 ReelEntries.Add(entry.GetID(), entry);
             }
+            watch.Stop();
+            ModHelper.Console.WriteLine("TIME IN MS: " + watch.ElapsedMilliseconds);
         }
 
         internal void AddMoreEntryListItemsAndCreateProjector(ShipLogMapMode mapMode)

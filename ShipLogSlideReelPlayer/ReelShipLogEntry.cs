@@ -16,32 +16,30 @@ namespace ShipLogSlideReelPlayer
         private ShipLogEntry _parentEntry;
         private List<string> _overridenByEntries;
 
-        public ReelShipLogEntry(string astroObjectID, XElement entryNode, ShipLogManager shipLogManager) :
-            base(astroObjectID, entryNode, entryNode.Element("DGARRO_PARENT").Value)
-        { 
-            string[] playWithShipLogFacts = null;
-
-            foreach (SlideCollectionContainer reel in Resources.FindObjectsOfTypeAll<SlideCollectionContainer>())
+        public static string GetPath(Transform current) {
+            if (current.parent == null)
+                return "/" + current.name;
+            return GetPath(current.parent) + "/" + current.name;
+        }
+        
+        public ReelShipLogEntry(string astroObjectID, XElement entryNode, SlideCollectionContainer reel, ShipLogManager shipLogManager) :
+            base(astroObjectID, entryNode, entryNode.Element("DGARRO_PARENT")!.Value)
+        {
+            _reel = CopySlideCollectionContainer(reel);
+            // XElement defaultSlideDurationForVision = entryNode.Element("DGARRO_DURATION");
+            float? defaultSlideDurationForVision = FindDefaultSlideDurationForVision(reel);
+            if (defaultSlideDurationForVision != null)
             {
-                if (reel.name == _id)
-                {
-                    _reel = CopySlideCollectionContainer(reel);
-                    playWithShipLogFacts = reel._playWithShipLogFacts;
-                    float? defaultSlideDurationForVision = FindDefaultSlideDurationForVision(reel);
-                    if (defaultSlideDurationForVision.HasValue)
-                    {
-                        _isVision = true;
-                        _defaultSlideDuration = defaultSlideDurationForVision.Value;
-                    }
-                    else
-                    {
-                        _isVision = false;
-                        _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
-                    }
-                    break;
-                }
+                _isVision = true;
+                _defaultSlideDuration = defaultSlideDurationForVision.Value;//float.Parse(defaultSlideDurationForVision.Value, OWUtilities.owFormatProvider);
             }
-
+            else
+            {
+                _isVision = false;
+                _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
+            }
+            if (!_isVision) ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(GetPath(reel.transform));
+     
             _parentEntry = shipLogManager.GetEntry(_parentID);
 
             _overridenByEntries = new List<string>();
@@ -50,7 +48,7 @@ namespace ShipLogSlideReelPlayer
                 _overridenByEntries.Add(overridenByEntry.Value);
             }
  
-            InitState(playWithShipLogFacts, shipLogManager);
+            InitState(reel._playWithShipLogFacts ?? Array.Empty<string>(), shipLogManager);
         }
 
         private void InitState(string[] playWithShipLogFacts, ShipLogManager shipLogManager)
