@@ -15,31 +15,42 @@ namespace ShipLogSlideReelPlayer
         private float _defaultSlideDuration;
         private ShipLogEntry _parentEntry;
         private List<string> _overridenByEntries;
-
-        public static string GetPath(Transform current) {
-            if (current.parent == null)
-                return "/" + current.name;
-            return GetPath(current.parent) + "/" + current.name;
-        }
         
         public ReelShipLogEntry(string astroObjectID, XElement entryNode, SlideCollectionContainer reel, ShipLogManager shipLogManager) :
             base(astroObjectID, entryNode, entryNode.Element("DGARRO_PARENT")!.Value)
         {
             _reel = CopySlideCollectionContainer(reel);
-            // XElement defaultSlideDurationForVision = entryNode.Element("DGARRO_DURATION");
-            float? defaultSlideDurationForVision = FindDefaultSlideDurationForVision(reel);
+ 
+            XElement defaultSlideDurationForVision = entryNode.Element("DGARRO_DURATION");
             if (defaultSlideDurationForVision != null)
             {
                 _isVision = true;
-                _defaultSlideDuration = defaultSlideDurationForVision.Value;//float.Parse(defaultSlideDurationForVision.Value, OWUtilities.owFormatProvider);
+                _defaultSlideDuration = float.Parse(defaultSlideDurationForVision.Value, OWUtilities.owFormatProvider);
             }
             else
             {
                 _isVision = false;
                 _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
             }
-            if (!_isVision) ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(GetPath(reel.transform));
-     
+
+            float? foundDuration = FindDefaultSlideDurationForVision(reel);
+            if (foundDuration.HasValue)
+            {
+                if (!_isVision)
+                {
+                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(reel.name + " has not duration but found with duration " + foundDuration);
+                }
+                else if (foundDuration != _defaultSlideDuration)
+                {
+                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(reel.name + " has wrong duration " + _defaultSlideDuration  
+                    + " instead of found one " + foundDuration);
+                }
+            }
+            else if (_isVision)
+            {
+                ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine(reel.name + " has duration but duration wasn't found");
+            }
+
             _parentEntry = shipLogManager.GetEntry(_parentID);
 
             _overridenByEntries = new List<string>();

@@ -62,11 +62,13 @@
 		<ID>Prefab_IP_Reel_ExperimentFail</ID>
 		<Name>First Experiment Vision</Name>
 		<DGARRO_PARENT>IP_ZONE_3_ENTRANCE</DGARRO_PARENT>
+		<DGARRO_DURATION>0.4</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_ExperimentSuccess</ID>
 		<Name>Third Experiment Vision</Name>
 		<DGARRO_PARENT>IP_ZONE_3_ENTRANCE</DGARRO_PARENT>
+		<DGARRO_DURATION>0.4</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_ExperimentWatch_Burned</ID>
@@ -132,16 +134,19 @@
 		<ID>Prefab_IP_Reel_PrisonPeephole_Vision</ID>
 		<Name>Vault Vision</Name>
 		<DGARRO_PARENT>IP_PRISON</DGARRO_PARENT>
+		<DGARRO_DURATION>0.6</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_TowerVision</ID>
 		<Name>Tower Secret Passage Vision</Name>
 		<DGARRO_PARENT>IP_DREAM_LAKE</DGARRO_PARENT>
+		<DGARRO_DURATION>0.6</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_4_Story_Vision</ID>
 		<Name>Prisoner Vision</Name>
 		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_DURATION>0.7</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_5_Story_Vision_NoInterloperNoVessel</ID>
@@ -150,27 +155,32 @@
 		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_NoInterloper</DGARRO_OVERRIDEN>
 		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_NoVessel</DGARRO_OVERRIDEN>
 		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_Complete</DGARRO_OVERRIDEN>
+		<DGARRO_DURATION>0.7</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_5_Story_Vision_NoInterloper</ID>
 		<Name>My Vision</Name>
 		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
 		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_Complete</DGARRO_OVERRIDEN>
+		<DGARRO_DURATION>0.7</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_5_Story_Vision_NoVessel</ID>
 		<Name>My Vision</Name>
 		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
 		<DGARRO_OVERRIDEN>Prefab_IP_Reel_5_Story_Vision_Complete</DGARRO_OVERRIDEN>
+		<DGARRO_DURATION>0.7</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_5_Story_Vision_Complete</ID>
 		<Name>My Vision</Name>
 		<DGARRO_PARENT>IP_SARCOPHAGUS</DGARRO_PARENT>
+		<DGARRO_DURATION>0.7</DGARRO_DURATION>
 	</Entry>
 	<Entry>
 		<ID>Prefab_IP_Reel_PrisonerFarewellVision</ID>
 		<Name>Farewell Vision</Name>
 		<DGARRO_PARENT>IP_DREAM_LAKE</DGARRO_PARENT>
+		<DGARRO_DURATION>0.7</DGARRO_DURATION>
 	</Entry>
 </AstroObjectEntry>
