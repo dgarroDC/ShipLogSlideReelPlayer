@@ -35,4 +35,9 @@
   <ItemGroup>
     <Content Include="ShipLogSlideReelPlayer.csproj.user" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CustomShipLogModes">
+      <HintPath>$(AppData)\OuterWildsModManager\OWML\Mods\dgarro.CustomShipLogModes\CustomShipLogModes.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

@@ -7,6 +7,7 @@ using System.IO;
 using System;
 using System.Linq;
 using System.Reflection;
+using CustomShipLogModes;
 using HarmonyLib;
 
 namespace ShipLogSlideReelPlayer
@@ -64,6 +65,13 @@ namespace ShipLogSlideReelPlayer
                 ReelShipLogEntry entry = new ReelShipLogEntry(astroObjectID, entryNode, foundReels[0], shipLogManager);
                 ReelEntries.Add(entry.GetID(), entry);
             }
+        }
+
+        public void CreateMode()
+        {
+            ICustomShipLogModesAPI customShipLogModesAPI = ModHelper.Interaction.TryGetModApi<ICustomShipLogModesAPI>("dgarro.CustomShipLogModes");
+            SlideReelPlayerMode reelPlayerMode = ItemListMode.Make<SlideReelPlayerMode>();
+            customShipLogModesAPI.AddMode(reelPlayerMode, () => true, () => reelPlayerMode.GetModeName());
         }
 
         internal void AddMoreEntryListItemsAndCreateProjector(ShipLogMapMode mapMode)

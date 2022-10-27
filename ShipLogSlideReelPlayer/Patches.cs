@@ -13,6 +13,7 @@ namespace ShipLogSlideReelPlayer
         private static void ShipLogManager_Awake(ShipLogManager __instance)
         {
             ShipLogSlideReelPlayer.Instance.LoadReelEntries(__instance);
+            ShipLogSlideReelPlayer.Instance.CreateMode();
         }
 
         // Don't use ShipLogManager.GetEntriesByAstroBody to interfere with less mods, use prefix to avoid duplication
