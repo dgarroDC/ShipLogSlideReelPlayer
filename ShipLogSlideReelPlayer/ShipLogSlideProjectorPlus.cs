@@ -23,6 +23,7 @@ namespace ShipLogSlideReelPlayer
 
         public ShipLogSlideProjectorPlus(ShipLogMapMode mapMode)
         {
+            // TODO: Can I use  texture = collection[this._slideIndex]._image;? What is image? Or _firstSlideStandIn???
             _photo = mapMode._photo;
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);

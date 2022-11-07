@@ -14,11 +14,16 @@ public class SlideReelPlayerMode : CustomShipLogModes.ItemListMode
     private int count = 0;
 
     protected override void OnItemSelected() {
+        ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("SELECTED="+SelectedIndex);
         if (SelectedIndex == 5)
         {
             UpdateItemCount(0);
         }
         count++;
+        if (count == 1)
+        {
+            SetEntryFocus(0);
+        }
     }
 
     public override void UpdateMode()   
@@ -42,11 +47,14 @@ public class SlideReelPlayerMode : CustomShipLogModes.ItemListMode
 
             if (i == 0)
             {
-                ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("ANCHORED 0="+ListItems[i]._iconRoot.anchoredPosition);
+                // ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("ANCHORED 0="+ListItems[i]._iconRoot.anchoredPosition);
             }
         }
         if (OWInput.IsNewlyPressed(InputLibrary.interact))
         {
+            // TODO: For some reason the init takes 40 ms vs 10 ms after map mode was OPENED, depends on planet selected? Less entries is better????
+            //AddMoreEntryListItemsAndCreateProjector is a big culprit, although it could be amortized? 
+            // GetComponentsInChildren only gets active, that could explain it (can we just keep them disabled?). Also, if 0 active then FAILURE
             ShipLogSlideReelPlayer.Instance.CreateMode("NEW!!!!! 1");
             // ShipLogSlideReelPlayer.Instance.CreateMode("NEW!!!!! 2");
             // ShipLogSlideReelPlayer.Instance.CreateMode("NEW!!!!! 3");

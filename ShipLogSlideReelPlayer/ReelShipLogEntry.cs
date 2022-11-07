@@ -20,7 +20,8 @@ namespace ShipLogSlideReelPlayer
             base(astroObjectID, entryNode, entryNode.Element("DGARRO_PARENT")!.Value)
         {
             _reel = CopySlideCollectionContainer(reel);
- 
+            // TODO PRINT _invertBlackFrames???
+            
             XElement defaultSlideDurationForVision = entryNode.Element("DGARRO_DURATION");
             if (defaultSlideDurationForVision != null)
             {
