@@ -1,9 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
+    
+    //TODO: Move to the new mode???
     public class ShipLogSlideProjectorPlus
     {
         private Image _photo;
@@ -21,10 +22,10 @@ namespace ShipLogSlideReelPlayer
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
 
-        public ShipLogSlideProjectorPlus(ShipLogMapMode mapMode)
+        public ShipLogSlideProjectorPlus(Image photo, ScreenPromptList promptList)
         {
             // TODO: Can I use  texture = collection[this._slideIndex]._image;? What is image? Or _firstSlideStandIn???
-            _photo = mapMode._photo;
+            _photo = photo;
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
@@ -32,9 +33,10 @@ namespace ShipLogSlideReelPlayer
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
             
-            Locator.GetPromptManager().AddScreenPrompt(_playPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_forwardPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_reversePrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
+            // TODO: Add on EnterMode, then remove, like all modes do...
+            Locator.GetPromptManager().AddScreenPrompt(_playPrompt, promptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_forwardPrompt, promptList, TextAnchor.MiddleRight);
+            Locator.GetPromptManager().AddScreenPrompt(_reversePrompt, promptList, TextAnchor.MiddleRight);
         }
         
         public void Update()
@@ -234,10 +236,11 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        public void OnEntrySelected(ShipLogEntryListItem[] entries, int index, int entryCount)
+        public void OnEntrySelected(ShipLogEntry[] entries, int index, int entryCount)
         {
+            // TODO: Remove lots of stuff
             RemoveReel();
-            ShipLogEntry entry = entries[index].GetEntry();
+            ShipLogEntry entry = entries[index];
             if (entry is ReelShipLogEntry reelEntry)
             {
                 // Loading the textures is probably only necessary in case no real entries are revealed,
@@ -256,7 +259,7 @@ namespace ShipLogSlideReelPlayer
             // Load textures of neighbors to avoid delay with white photo when displaying the entry
             if (entryCount >= 2)
             {
-                ShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)].GetEntry();
+                ShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)];
                 if (prevEntry is ReelShipLogEntry prevReelEntry)
                 {
                     prevReelEntry.LoadStreamingTextures();
@@ -264,7 +267,7 @@ namespace ShipLogSlideReelPlayer
 
                 if (entryCount >= 3)
                 {
-                    ShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)].GetEntry();
+                    ShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)];
                     if (nextEntry is ReelShipLogEntry nextReelEntry)
                     {
                         nextReelEntry.LoadStreamingTextures();

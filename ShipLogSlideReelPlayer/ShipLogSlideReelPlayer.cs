@@ -93,8 +93,9 @@ namespace ShipLogSlideReelPlayer
                 mapMode._listItems[i] = newItem.GetComponent<ShipLogEntryListItem>();
                 mapMode._listItems[i].Init(mapMode._fontAndLanguageController);
             }
-            
-            _reelProjector = new ShipLogSlideProjectorPlus(mapMode);
+
+            // TODO: REMOVE
+            _reelProjector = new ShipLogSlideProjectorPlus(mapMode._photo, mapMode._upperRightPromptList);
         }
 
         public bool HasAncestor(ShipLogEntry entry, string ancestor)
@@ -122,7 +123,7 @@ namespace ShipLogSlideReelPlayer
 
         public void OnEntrySelected(ShipLogMapMode mapMode)
         {
-            _reelProjector.OnEntrySelected(mapMode._listItems, mapMode._entryIndex, mapMode._maxIndex + 1);
+            _reelProjector.OnEntrySelected(mapMode._listItems.Select(e => e.GetEntry()).ToArray(), mapMode._entryIndex, mapMode._maxIndex + 1);
         }
 
         public void Close()

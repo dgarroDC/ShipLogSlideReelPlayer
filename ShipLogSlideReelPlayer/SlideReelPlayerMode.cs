@@ -1,66 +1,29 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEngine;
+using System.Linq;
 
 namespace ShipLogSlideReelPlayer;
 
 public class SlideReelPlayerMode : CustomShipLogModes.ItemListMode
 {
+    private ShipLogSlideProjectorPlus _reelProjector;
+    private ShipLogEntry[] _reels;
+
     public override string GetModeName()
     {
         return "Slide Reel Player";
     }
 
-    private int count = 0;
-
     protected override void OnItemSelected() {
-        ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("SELECTED="+SelectedIndex);
-        if (SelectedIndex == 5)
-        {
-            UpdateItemCount(0);
-        }
-        count++;
-        if (count == 1)
-        {
-            SetEntryFocus(0);
-        }
+        _reelProjector.OnEntrySelected(_reels, SelectedIndex, _reels.Length);
     }
 
-    public override void UpdateMode()   
+    public override void Initialize(ScreenPromptList centerPromptList, ScreenPromptList upperRightPromptList, OWAudioSource oneShotSource)
     {
-        base.UpdateMode();
-        for (int i = 0; i < 30; i++)
-        {
-            if (OWInput.IsNewlyPressed(InputLibrary.left))
-            {
-                // TODO: why -15f sometimes not needed???
-                ListItems[i]._iconRoot.anchoredPosition = new Vector2(ListItems[i]._nameField.rectTransform.sizeDelta.x * ListItems[i]._nameField.rectTransform.localScale.x + 2f, -15f);
-            }
-            if (OWInput.IsNewlyPressed(InputLibrary.right))
-            {
-                ListItems[i]._moreToExploreIcon.gameObject.SetActive(!ListItems[i]._moreToExploreIcon.gameObject.activeInHierarchy);
-            }           
-            if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
-            {
-                ListItems[i]._nameField.text += "+";
-            }    
-
-            if (i == 0)
-            {
-                // ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("ANCHORED 0="+ListItems[i]._iconRoot.anchoredPosition);
-            }
-        }
-        if (OWInput.IsNewlyPressed(InputLibrary.interact))
-        {
-            // TODO: For some reason the init takes 40 ms vs 10 ms after map mode was OPENED, depends on planet selected? Less entries is better????
-            //AddMoreEntryListItemsAndCreateProjector is a big culprit, although it could be amortized? 
-            // GetComponentsInChildren only gets active, that could explain it (can we just keep them disabled?). Also, if 0 active then FAILURE
-            ShipLogSlideReelPlayer.Instance.CreateMode("NEW!!!!! 1");
-            // ShipLogSlideReelPlayer.Instance.CreateMode("NEW!!!!! 2");
-            // ShipLogSlideReelPlayer.Instance.CreateMode("NEW!!!!! 3");
-        }
+        base.Initialize(centerPromptList, upperRightPromptList, oneShotSource);
+        
+        Photo.gameObject.SetActive(true); // This will be ALWAYS active, we own this photo
+        _reelProjector = new ShipLogSlideProjectorPlus(Photo, UpperRightPromptList);
     }
-    
 
     public override void EnterMode(string entryID = "", List<ShipLogFact> revealQueue = null)
     {
@@ -68,22 +31,25 @@ public class SlideReelPlayerMode : CustomShipLogModes.ItemListMode
 
         OneShotSource.PlayOneShot(AudioType.Artifact_Insert);
 
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
-        UpdateItemCount(30);
-        sw.Stop();
-        ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Elapsed A: "+sw.ElapsedMilliseconds);
-        sw.Reset();
-        sw.Start();
-        for (int i = 0; i < 30; i++)
+        // TODO: Get rid of ShipLogEntry extension
+        _reels = ShipLogSlideReelPlayer.Instance.ReelEntries.Values
+            .Where(re => re.GetState() == ShipLogEntry.State.Explored)
+            .ToArray();
+        
+        // TODO: Why is the mark on hud visible in the last reels?
+
+        UpdateItemCount(_reels.Length);
+        for (int i = 0; i < _reels.Length; i++)
         {
-            ListItems[i]._nameField.text = "TEST " + i;
-            if (i % 3 == 0)
-            {
-                // ListItems[i]._moreToExploreIcon.gameObject.SetActive(true);   
-            }
+            ListItems[i]._nameField.text = _reels[i].GetName(false);
+            ListItems[i]._moreToExploreIcon.gameObject.SetActive(_reels[i].HasMoreToExplore()); // TODO: Also TEXT
         }
-        sw.Stop();
-        ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Elapsed B: "+sw.ElapsedMilliseconds);
+    }
+    
+    public override void UpdateMode()   
+    {
+        base.UpdateMode();
+
+        _reelProjector.Update();
     }
 }
