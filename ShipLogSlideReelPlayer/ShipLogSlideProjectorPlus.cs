@@ -236,6 +236,7 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
+        // TODO: Rename, eventually...
         public void OnEntrySelected(ShipLogEntry[] entries, int index, int entryCount)
         {
             // TODO: Remove lots of stuff
@@ -243,6 +244,7 @@ namespace ShipLogSlideReelPlayer
             ShipLogEntry entry = entries[index];
             if (entry is ReelShipLogEntry reelEntry)
             {
+                // TODO: CASE NO LONGER POSSIBLE!
                 // Loading the textures is probably only necessary in case no real entries are revealed,
                 // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
                 reelEntry.PlaceReelOnProjector(this);

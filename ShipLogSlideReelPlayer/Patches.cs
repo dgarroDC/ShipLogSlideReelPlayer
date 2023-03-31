@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
+// TODO: Remove a bunch of patches
 namespace ShipLogSlideReelPlayer
 {
     [HarmonyPatch]
