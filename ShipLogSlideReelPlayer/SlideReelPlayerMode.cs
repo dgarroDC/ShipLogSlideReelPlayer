@@ -38,13 +38,18 @@ public class SlideReelPlayerMode : CustomShipLogModes.ItemListMode
         
         // TODO: Why is the mark on hud visible in the last reels?
 
-        UpdateItemCount(_reels.Length);
+        List<string> texts = new List<string>();
         for (int i = 0; i < _reels.Length; i++)
         {
-            ListItems[i]._nameField.text = _reels[i].GetName(false);
-            ListItems[i]._moreToExploreIcon.gameObject.SetActive(_reels[i].HasMoreToExplore()); // TODO: Also TEXT
+            texts.Add(_reels[i].GetName(false));
+          // TODO:  ListItems[i]._moreToExploreIcon.gameObject.SetActive(_reels[i].HasMoreToExplore()); // TODO: Also TEXT
         }
+
+        ContentsItems = texts;
     }
+    
+    // TODO: Entry menu animation too????
+    // TODO: Remove reel on exit? Or wait until fully closed animator???
     
     public override void UpdateMode()   
     {

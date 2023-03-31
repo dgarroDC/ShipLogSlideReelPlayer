@@ -17,10 +17,11 @@ namespace ShipLogSlideReelPlayer
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(ShipLogController), nameof(ShipLogController.LateInitialize))]
+        [HarmonyPatch(typeof(ShipLogMapMode), nameof(ShipLogMapMode.EnterMode))]
         private static void ShipLogManager_Awake()
         {
-            ShipLogSlideReelPlayer.Instance.CreateMode("POST MAP MODE");
+            ShipLogSlideReelPlayer.Instance.ModHelper.Events.Unity.FireInNUpdates((() =>
+            ShipLogSlideReelPlayer.Instance.CreateMode("POST MAP MODE") ), 120);
         }
         
         // Don't use ShipLogManager.GetEntriesByAstroBody to interfere with less mods, use prefix to avoid duplication
