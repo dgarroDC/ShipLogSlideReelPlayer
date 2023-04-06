@@ -71,12 +71,14 @@ namespace ShipLogSlideReelPlayer
         public void CreateMode(string name)
         {
             ICustomShipLogModesAPI customShipLogModesAPI = ModHelper.Interaction.TryGetModApi<ICustomShipLogModesAPI>("dgarro.CustomShipLogModes");
-            GameObject reelPlayerModeGo = ItemsList.Make(true);
-            SlideReelPlayerMode reelPlayerMode = reelPlayerModeGo.AddComponent<SlideReelPlayerMode>();
-            // TODO: Enabled if >= 1 explored reel
-            reelPlayerMode.gameObject.name = name;
-            ModHelper.Console.WriteLine(reelPlayerMode.ToString());
-            customShipLogModesAPI.AddMode(reelPlayerMode, () => _thing, () => SlideReelPlayerMode.Name);
+            ItemsList.Make(true, reelPlayerModeGo =>
+            {
+                SlideReelPlayerMode reelPlayerMode = reelPlayerModeGo.AddComponent<SlideReelPlayerMode>();
+                // TODO: Enabled if >= 1 explored reel
+                reelPlayerMode.gameObject.name = name;
+                ModHelper.Console.WriteLine(reelPlayerMode.ToString());
+                customShipLogModesAPI.AddMode(reelPlayerMode, () => _thing, () => SlideReelPlayerMode.Name);
+            });
         }
 
         internal void AddMoreEntryListItemsAndCreateProjector(ShipLogMapMode mapMode)

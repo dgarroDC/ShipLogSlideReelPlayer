@@ -27,8 +27,8 @@ public class SlideReelPlayerMode : ShipLogMode
         _itemsList.Initialize();
         _itemsList.SetName(Name);
         
-        _itemsList.Photo.gameObject.SetActive(true); // This will be ALWAYS active, we own this photo
-        _reelProjector = new ShipLogSlideProjectorPlus(_itemsList.Photo, upperRightPromptList);
+        _itemsList.photo.gameObject.SetActive(true); // This will be ALWAYS active, we own this photo
+        _reelProjector = new ShipLogSlideProjectorPlus(_itemsList.photo, upperRightPromptList);
     }
 
     public override void EnterMode(string entryID = "", List<ShipLogFact> revealQueue = null)
@@ -51,9 +51,9 @@ public class SlideReelPlayerMode : ShipLogMode
           // TODO:  ListItems[i]._moreToExploreIcon.gameObject.SetActive(_reels[i].HasMoreToExplore()); // TODO: Also TEXT
         }
 
-        _itemsList.ContentsItems = texts;
-        _itemsList.SelectedIndex = 0; // TODO: Remember selection? Take into consideration that new reels could be discovered
-        _reelProjector.OnEntrySelected(_reels, _itemsList.SelectedIndex, _reels.Length);
+        _itemsList.contentsItems = texts;
+        _itemsList.selectedIndex = 0; // TODO: Remember selection? Take into consideration that new reels could be discovered
+        _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
     }
 
     // TODO: Entry menu animation too????
@@ -62,7 +62,7 @@ public class SlideReelPlayerMode : ShipLogMode
     {
         if (_itemsList.UpdateList())
         {
-            _reelProjector.OnEntrySelected(_reels, _itemsList.SelectedIndex, _reels.Length);
+            _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
         }
         _reelProjector.Update();
     }
