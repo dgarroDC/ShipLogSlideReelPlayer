@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CustomShipLogModes;
 
@@ -15,19 +16,16 @@ public class SlideReelPlayerMode : ShipLogMode
 
     private OWAudioSource _oneShotSource;
 
-    // protected override void OnItemSelected() {
-    //     _reelProjector.OnEntrySelected(_reels, SelectedIndex, _reels.Length);
-    // }
-
     public override void Initialize(ScreenPromptList centerPromptList, ScreenPromptList upperRightPromptList, OWAudioSource oneShotSource)
     {
         _oneShotSource = oneShotSource;
 
         _itemsList = GetComponent<ItemsList>();
-        _itemsList.Initialize();
         _itemsList.SetName(Name);
-        
-        _itemsList.photo.gameObject.SetActive(true); // This will be ALWAYS active, we own this photo
+
+        // There are no guarantees of the initial state of question mark and photo
+        _itemsList.questionMark.gameObject.SetActive(false);
+        _itemsList.photo.gameObject.SetActive(true);
         _reelProjector = new ShipLogSlideProjectorPlus(_itemsList.photo, upperRightPromptList);
     }
 
@@ -44,23 +42,21 @@ public class SlideReelPlayerMode : ShipLogMode
         
         // TODO: Why is the mark on hud visible in the last reels?
 
-        List<string> texts = new List<string>();
+        List<Tuple<string, bool, bool, bool>> items = new();
         for (int i = 0; i < _reels.Length; i++)
         {
-            texts.Add(_reels[i].GetName(false));
-          // TODO:  ListItems[i]._moreToExploreIcon.gameObject.SetActive(_reels[i].HasMoreToExplore()); // TODO: Also TEXT
+            ShipLogEntry rell = _reels[i];
+            items.Add(new Tuple<string, bool, bool, bool>(rell.GetName(false), false, false, rell.HasMoreToExplore())); 
+            // TODO: Also more to explore TEXT (another one? "something missing")
         }
 
-        _itemsList.contentsItems = texts;
+        _itemsList.contentsItems = items;
         _itemsList.selectedIndex = 0; // TODO: Remember selection? Take into consideration that new reels could be discovered
         _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
     }
-
-    // TODO: Entry menu animation too????
-    
     public override void UpdateMode()   
     {
-        if (_itemsList.UpdateList())
+        if (_itemsList.UpdateList() != 0)
         {
             _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
         }
