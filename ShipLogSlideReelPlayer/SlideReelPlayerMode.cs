@@ -45,20 +45,32 @@ public class SlideReelPlayerMode : ShipLogMode
         List<Tuple<string, bool, bool, bool>> items = new();
         for (int i = 0; i < _reels.Length; i++)
         {
-            ShipLogEntry rell = _reels[i];
-            items.Add(new Tuple<string, bool, bool, bool>(rell.GetName(false), false, false, rell.HasMoreToExplore())); 
+            ShipLogEntry reel = _reels[i];
+            items.Add(new Tuple<string, bool, bool, bool>(reel.GetName(false), false, false, reel.HasMoreToExplore())); 
             // TODO: Also more to explore TEXT (another one? "something missing")
         }
 
         _itemsList.contentsItems = items;
         _itemsList.selectedIndex = 0; // TODO: Remember selection? Take into consideration that new reels could be discovered
+        OnItemSelected();
+    }
+
+    private void OnItemSelected()
+    {
+        _itemsList.DescriptionFieldClear();
+        if (_reels[_itemsList.selectedIndex].HasMoreToExplore())
+        {
+            // TODO: Translation
+            _itemsList.DescriptionFieldGetNextItem().DisplayText("<color=orange>There's something missing here.</color>");
+        }
         _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
     }
-    public override void UpdateMode()   
+
+    public override void UpdateMode()
     {
         if (_itemsList.UpdateList() != 0)
         {
-            _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
+            OnItemSelected();
         }
         _reelProjector.Update();
     }
