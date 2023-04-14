@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ShipLogSlideReelPlayer;
+namespace ShipLogSlideReelPlayer.CustomShipLogModes;
 
 public interface ICustomShipLogModesAPI
 {

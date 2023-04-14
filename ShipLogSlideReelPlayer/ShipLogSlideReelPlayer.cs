@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using ShipLogSlideReelPlayer.CustomShipLogModes;
 
 namespace ShipLogSlideReelPlayer
 {
@@ -74,8 +75,7 @@ namespace ShipLogSlideReelPlayer
             customShipLogModesAPI.ItemListMake(true, itemList =>
             {
                 SlideReelPlayerMode reelPlayerMode = itemList.gameObject.AddComponent<SlideReelPlayerMode>();
-                reelPlayerMode.API = customShipLogModesAPI;
-                reelPlayerMode.itemList = itemList;
+                reelPlayerMode.itemList = new ItemListWrapper(customShipLogModesAPI, itemList);
                 // TODO: Enabled if >= 1 explored reel
                 reelPlayerMode.gameObject.name = name;
                 ModHelper.Console.WriteLine(reelPlayerMode.ToString());
