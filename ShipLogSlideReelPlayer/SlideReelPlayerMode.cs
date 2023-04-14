@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CustomShipLogModes;
+using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer;
 
@@ -12,26 +12,25 @@ public class SlideReelPlayerMode : ShipLogMode
 
     private ShipLogSlideProjectorPlus _reelProjector;
     private ShipLogEntry[] _reels;
-    private ItemsList _itemsList;
 
     private OWAudioSource _oneShotSource;
+    public ICustomShipLogModesAPI API;
 
     public override void Initialize(ScreenPromptList centerPromptList, ScreenPromptList upperRightPromptList, OWAudioSource oneShotSource)
     {
         _oneShotSource = oneShotSource;
 
-        _itemsList = GetComponent<ItemsList>();
-        _itemsList.SetName(Name);
+        API.ItemListSetName(gameObject, Name);
 
-        // There are no guarantees of the initial state of question mark and photo
-        _itemsList.questionMark.gameObject.SetActive(false);
-        _itemsList.photo.gameObject.SetActive(true);
-        _reelProjector = new ShipLogSlideProjectorPlus(_itemsList.photo, upperRightPromptList);
+        // Enable because by default it's disabled
+        Image photo = API.ItemListGetPhoto(gameObject);
+        photo.gameObject.SetActive(true); // By default it's disabled
+        _reelProjector = new ShipLogSlideProjectorPlus(photo, upperRightPromptList);
     }
 
     public override void EnterMode(string entryID = "", List<ShipLogFact> revealQueue = null)
     {
-        _itemsList.Open();
+        API.ItemListOpen(gameObject);
 
         _oneShotSource.PlayOneShot(AudioType.Artifact_Insert);
 
@@ -50,25 +49,27 @@ public class SlideReelPlayerMode : ShipLogMode
             // TODO: Also more to explore TEXT (another one? "something missing")
         }
 
-        _itemsList.contentsItems = items;
-        _itemsList.selectedIndex = 0; // TODO: Remember selection? Take into consideration that new reels could be discovered
+        API.ItemListSetItems(gameObject, items);
+        API.ItemListSetSelectedIndex(gameObject, 0); // TODO: Remember selection? Take into consideration that new reels could be discovered
         OnItemSelected();
     }
 
     private void OnItemSelected()
     {
-        _itemsList.DescriptionFieldClear();
-        if (_reels[_itemsList.selectedIndex].HasMoreToExplore())
+        int selectedIndex = API.ItemListGetSelectedIndex(gameObject);
+        API.ItemListDescriptionFieldClear(gameObject);
+        if (_reels[selectedIndex].HasMoreToExplore())
         {
             // TODO: Translation
-            _itemsList.DescriptionFieldGetNextItem().DisplayText("<color=orange>There's something missing here.</color>");
+            API.ItemListDescriptionFieldGetNextItem(gameObject).DisplayText("<color=orange>There's something missing here.</color>");
         }
-        _reelProjector.OnEntrySelected(_reels, _itemsList.selectedIndex, _reels.Length);
+
+        _reelProjector.OnEntrySelected(_reels, selectedIndex, _reels.Length);
     }
 
     public override void UpdateMode()
     {
-        if (_itemsList.UpdateList() != 0)
+        if (API.ItemListUpdateList(gameObject) != 0)
         {
             OnItemSelected();
         }
@@ -77,7 +78,8 @@ public class SlideReelPlayerMode : ShipLogMode
 
     public override void ExitMode()
     {
-        _itemsList.Close();
+        API.ItemListDescriptionFieldClear(gameObject); // Just in case...
+        API.ItemListClose(gameObject);
         // TODO: Probably more, remove reel ( Or wait until fully closed animator???) or something, also prompts
     }
 
