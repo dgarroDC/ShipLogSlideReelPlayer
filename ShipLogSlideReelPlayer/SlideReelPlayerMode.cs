@@ -17,17 +17,20 @@ public class SlideReelPlayerMode : ShipLogMode
     private ReelShipLogEntry[] _reels;
 
     private OWAudioSource _oneShotSource;
+    private ScreenPromptList _upperRightPromptList;
 
     public override void Initialize(ScreenPromptList centerPromptList, ScreenPromptList upperRightPromptList, OWAudioSource oneShotSource)
     {
         _oneShotSource = oneShotSource;
+        _upperRightPromptList = upperRightPromptList;
 
         itemList.SetName(Name);
 
         // Enable because by default it's disabled
         Image photo = itemList.GetPhoto();
         photo.gameObject.SetActive(true); // By default it's disabled
-        _reelProjector = new ShipLogSlideProjectorPlus(photo, upperRightPromptList);
+
+        _reelProjector = new ShipLogSlideProjectorPlus(photo, _upperRightPromptList);
     }
 
     public override void EnterMode(string entryID = "", List<ShipLogFact> revealQueue = null)
@@ -40,20 +43,19 @@ public class SlideReelPlayerMode : ShipLogMode
         _reels = ShipLogSlideReelPlayer.Instance.ReelEntries.Values
             .Where(re => re.GetState() == ShipLogEntry.State.Explored)
             .ToArray();
-        
-        // TODO: Why is the mark on hud visible in the last reels?
 
         List<Tuple<string, bool, bool, bool>> items = new();
         for (int i = 0; i < _reels.Length; i++)
         {
             ShipLogEntry reel = _reels[i];
             items.Add(new Tuple<string, bool, bool, bool>(reel.GetName(false), false, false, reel.HasMoreToExplore())); 
-            // TODO: Also more to explore TEXT (another one? "something missing")
         }
 
         itemList.SetItems(items);
         itemList.SetSelectedIndex(0); // TODO: Remember selection? Take into consideration that new reels could be discovered
         OnItemSelected();
+
+        _reelProjector.AddPrompts();
     }
 
     private void OnItemSelected()
@@ -82,8 +84,8 @@ public class SlideReelPlayerMode : ShipLogMode
     {
         itemList.DescriptionFieldClear(); // Just in case...
         itemList.Close();
-        // TODO: Probably more, remove reel ( Or wait until fully closed animator???) or something, also prompts
         _reelProjector.RemoveReel();
+        _reelProjector.RemovePrompts();
         ShipLogSlideReelPlayer.Instance.UnloadAllTextures();
         // Note: Texture aren't unloaded while the game is paused (StreamingIteratedTextureAssetBundle.Update())
         // textured unloaded by updating slide index are, meaning that up to 5*#Reels textures could be loaded

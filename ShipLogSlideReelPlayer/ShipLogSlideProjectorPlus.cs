@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
-    
     public class ShipLogSlideProjectorPlus
     {
         private Image _photo;
@@ -14,6 +13,7 @@ namespace ShipLogSlideReelPlayer
         private bool _autoPlaying;
         private float _lastSlidePlayTime;
 
+        private ScreenPromptList _promptList;
         private ScreenPrompt _playPrompt;
         private ScreenPrompt _forwardPrompt;
         private ScreenPrompt _reversePrompt;
@@ -28,14 +28,10 @@ namespace ShipLogSlideReelPlayer
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
+            _promptList = promptList;
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
-            
-            // TODO: Add on EnterMode, then remove, like all modes do...
-            Locator.GetPromptManager().AddScreenPrompt(_playPrompt, promptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_forwardPrompt, promptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_reversePrompt, promptList, TextAnchor.MiddleRight);
         }
         
         public void Update()
@@ -94,11 +90,27 @@ namespace ShipLogSlideReelPlayer
         }
 
         private void UpdatePromptsVisibility()
-        {
-            _playPrompt.SetVisibility(IsReelPlaced());
+        { 
+            _playPrompt.SetVisibility(true);
             _playPrompt.SetText(_autoPlaying ? "Stop" : "Play");
-            _forwardPrompt.SetVisibility(IsReelPlaced() && !_autoPlaying);
-            _reversePrompt.SetVisibility(IsReelPlaced() && !_autoPlaying);
+            _forwardPrompt.SetVisibility(!_autoPlaying);
+            _reversePrompt.SetVisibility(!_autoPlaying);
+        }
+
+        public void AddPrompts()
+        {
+            var promptManager = Locator.GetPromptManager();
+            promptManager.AddScreenPrompt(_playPrompt, _promptList, TextAnchor.MiddleRight);
+            promptManager.AddScreenPrompt(_forwardPrompt, _promptList, TextAnchor.MiddleRight);
+            promptManager.AddScreenPrompt(_reversePrompt, _promptList, TextAnchor.MiddleRight);
+        }
+
+        public void RemovePrompts()
+        {
+            var promptManager = Locator.GetPromptManager();
+            promptManager.RemoveScreenPrompt(_playPrompt);
+            promptManager.RemoveScreenPrompt(_forwardPrompt);
+            promptManager.RemoveScreenPrompt(_reversePrompt);
         }
 
         public void PlaceReel(SlideCollectionContainer reel, bool isVision, float defaultSlideDuration)
@@ -146,10 +158,6 @@ namespace ShipLogSlideReelPlayer
                 _reel.enabled = false;
                 _reel = null;
                 _playing = false;
-
-                _forwardPrompt.SetVisibility(false);
-                _reversePrompt.SetVisibility(false);
-                _playPrompt.SetVisibility(false);
             }
         }
   
