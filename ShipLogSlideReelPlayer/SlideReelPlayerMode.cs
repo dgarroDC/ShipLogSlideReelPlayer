@@ -14,7 +14,7 @@ public class SlideReelPlayerMode : ShipLogMode
     public ItemListWrapper itemList;
 
     private ShipLogSlideProjectorPlus _reelProjector;
-    private ShipLogEntry[] _reels;
+    private ReelShipLogEntry[] _reels;
 
     private OWAudioSource _oneShotSource;
 
@@ -66,7 +66,7 @@ public class SlideReelPlayerMode : ShipLogMode
             itemList.DescriptionFieldGetNextItem().DisplayText("<color=orange>There's something missing here.</color>");
         }
 
-        _reelProjector.OnEntrySelected(_reels, selectedIndex, _reels.Length);
+        _reelProjector.OnEntrySelected(_reels, selectedIndex);
     }
 
     public override void UpdateMode()
@@ -83,6 +83,10 @@ public class SlideReelPlayerMode : ShipLogMode
         itemList.DescriptionFieldClear(); // Just in case...
         itemList.Close();
         // TODO: Probably more, remove reel ( Or wait until fully closed animator???) or something, also prompts
+        _reelProjector.RemoveReel();
+        ShipLogSlideReelPlayer.Instance.UnloadAllTextures();
+        // Note: Texture aren't unloaded while the game is paused (StreamingIteratedTextureAssetBundle.Update())
+        // textured unloaded by updating slide index are, meaning that up to 5*#Reels textures could be loaded
     }
 
     public override void OnEnterComputer()

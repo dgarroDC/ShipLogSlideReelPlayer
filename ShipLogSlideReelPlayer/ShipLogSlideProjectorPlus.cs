@@ -4,7 +4,6 @@ using UnityEngine.UI;
 namespace ShipLogSlideReelPlayer
 {
     
-    //TODO: Move to the new mode???
     public class ShipLogSlideProjectorPlus
     {
         private Image _photo;
@@ -237,43 +236,23 @@ namespace ShipLogSlideReelPlayer
         }
 
         // TODO: Rename, eventually...
-        public void OnEntrySelected(ShipLogEntry[] entries, int index, int entryCount)
+        public void OnEntrySelected(ReelShipLogEntry[] entries, int index)
         {
-            // TODO: Remove lots of stuff
             RemoveReel();
-            ShipLogEntry entry = entries[index];
-            if (entry is ReelShipLogEntry reelEntry)
-            {
-                // TODO: CASE NO LONGER POSSIBLE!
-                // Loading the textures is probably only necessary in case no real entries are revealed,
-                // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
-                reelEntry.PlaceReelOnProjector(this);
-                reelEntry.LoadStreamingTextures();
-            }
-            else
-            {
-                // Don't restore the material every time we remove a reel,
-                // otherwise changing to rumor mode or map we would briefly see the inverted reel textures
-                // Placing a vision reel also restore the material in the other branch
-                RestoreOriginalMaterial();
-            }
+            ReelShipLogEntry selected = entries[index];
+            selected.PlaceReelOnProjector(this);
+            selected.LoadStreamingTextures();
 
             // Load textures of neighbors to avoid delay with white photo when displaying the entry
+            int entryCount = entries.Length;
             if (entryCount >= 2)
             {
-                ShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)];
-                if (prevEntry is ReelShipLogEntry prevReelEntry)
-                {
-                    prevReelEntry.LoadStreamingTextures();
-                }
-
+                ReelShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)];
+                prevEntry.LoadStreamingTextures();
                 if (entryCount >= 3)
                 {
-                    ShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)];
-                    if (nextEntry is ReelShipLogEntry nextReelEntry)
-                    {
-                        nextReelEntry.LoadStreamingTextures();
-                    }
+                    ReelShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)];
+                    nextEntry.LoadStreamingTextures();
                 }
             }
         }

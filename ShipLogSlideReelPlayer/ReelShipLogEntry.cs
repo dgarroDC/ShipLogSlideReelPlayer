@@ -13,7 +13,6 @@ namespace ShipLogSlideReelPlayer
         private SlideCollectionContainer _reel;
         private bool _isVision;
         private float _defaultSlideDuration;
-        private ShipLogEntry _parentEntry;
         private List<string> _overridenByEntries;
         
         public ReelShipLogEntry(string astroObjectID, XElement entryNode, SlideCollectionContainer reel, ShipLogManager shipLogManager) :
@@ -33,8 +32,6 @@ namespace ShipLogSlideReelPlayer
                 _isVision = false;
                 _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
             }
-
-            _parentEntry = shipLogManager.GetEntry(_parentID);
 
             _overridenByEntries = new List<string>();
             foreach (XElement overridenByEntry in entryNode.Elements("DGARRO_OVERRIDEN"))
@@ -141,11 +138,6 @@ namespace ShipLogSlideReelPlayer
             return "<color=#90FEF3>" + _name + "</color>";
         }
 
-        public new bool HasUnreadFacts()
-        {
-            return false;
-        }
-
         public new bool HasMoreToExplore()
         {
             return _overridenByEntries.Count > 0;
@@ -165,16 +157,6 @@ namespace ShipLogSlideReelPlayer
                 }
             }
             return _state;
-        }
-
-        public bool HasRevealedGrandParent()
-        {
-            return _parentEntry.HasRevealedParent();
-        }
-
-        public bool IsGrandChildOf(string ancestor)
-        {
-            return _parentEntry.HasParent() && _parentEntry.GetParentID() == ancestor;
         }
 
         private string GetReadCondition()
