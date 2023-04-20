@@ -126,10 +126,6 @@ namespace ShipLogSlideReelPlayer
             _playing = false;
             _autoPlaying = false;
 
-            _forwardPrompt.SetVisibility(true);
-            _reversePrompt.SetVisibility(true);
-            _playPrompt.SetVisibility(true);
-
             if (!_isVision)
             {
                 // Texture from reels are inverted, use shader to invert it back
