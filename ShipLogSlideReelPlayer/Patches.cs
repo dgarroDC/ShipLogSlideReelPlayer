@@ -10,8 +10,13 @@ namespace ShipLogSlideReelPlayer
         [HarmonyPatch(typeof(ShipLogManager), nameof(ShipLogManager.Awake))]
         private static void ShipLogManager_Awake(ShipLogManager __instance)
         {
-            ShipLogSlideReelPlayer.Instance.LoadReelEntries(__instance);
-            ShipLogSlideReelPlayer.Instance.CreateMode();
+            // TODO: Why here?
+            ShipLogSlideReelPlayer.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+            {
+                ShipLogSlideReelPlayer.Instance.LoadReelEntries(__instance);
+                ShipLogSlideReelPlayer.Instance.CreateMode();
+            }, 300);
+
         }
 
         [HarmonyPrefix]
