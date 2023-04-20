@@ -15,42 +15,6 @@ namespace ShipLogSlideReelPlayer
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(ShipLogEntry), nameof(ShipLogEntry.HasMoreToExplore))]
-        private static bool ShipLogEntry_HasMoreToExplore(ShipLogEntry __instance, ref bool __result)
-        {
-            if (__instance is ReelShipLogEntry entry)
-            {
-                __result = entry.HasMoreToExplore();
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ShipLogEntry), nameof(ShipLogEntry.GetState))]
-        private static bool ShipLogEntry_GetState(ShipLogEntry __instance, ref ShipLogEntry.State __result)
-        {
-            if (__instance is ReelShipLogEntry entry)
-            {
-                __result = entry.GetState();
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ShipLogEntry), nameof(ShipLogEntry.GetName))]
-        private static bool ShipLogEntry_GetName(ShipLogEntry __instance, ref string __result, ref bool withLineBreaks)
-        {
-            if (__instance is ReelShipLogEntry entry)
-            {
-                __result = entry.GetName(withLineBreaks);
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
         [HarmonyPatch(typeof(DeathManager), nameof(DeathManager.FinishDeathSequence))]
         private static void DeathManager_FinishDeathSequence()
         {

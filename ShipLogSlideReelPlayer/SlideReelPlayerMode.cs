@@ -47,7 +47,7 @@ public class SlideReelPlayerMode : ShipLogMode
         List<Tuple<string, bool, bool, bool>> items = new();
         for (int i = 0; i < _reels.Length; i++)
         {
-            ShipLogEntry reel = _reels[i];
+            ReelShipLogEntry reel = _reels[i];
             items.Add(new Tuple<string, bool, bool, bool>(reel.GetName(false), false, false, reel.HasMoreToExplore())); 
         }
 
