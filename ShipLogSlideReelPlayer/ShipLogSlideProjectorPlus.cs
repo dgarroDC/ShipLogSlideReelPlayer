@@ -108,9 +108,11 @@ namespace ShipLogSlideReelPlayer
 
         public void RemovePrompts()
         {
+            // We probably could keep them on our list, but idk
             _promptListSwitcher.RemoveScreenPrompt(_playPrompt);
             _promptListSwitcher.RemoveScreenPrompt(_forwardPrompt);
             _promptListSwitcher.RemoveScreenPrompt(_reversePrompt);
+            _promptListSwitcher.Reset();
         }
 
         public void PlaceReel(SlideCollectionContainer reel, bool isVision, float defaultSlideDuration)

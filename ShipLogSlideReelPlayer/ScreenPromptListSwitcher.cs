@@ -4,11 +4,13 @@ namespace ShipLogSlideReelPlayer;
 
 public class ScreenPromptListSwitcher
 {
+    private const float SwitchTime = 3f;
+    private double _lastSwitchTime;
+
     private ScreenPromptList _originalPromptList;
     private ScreenPromptList _newPromptList;
     private PromptManager _promptManager;
 
-    private double _lastSwitchTime = -100f;
 
     public ScreenPromptListSwitcher(ScreenPromptList originalPromptList)
     {
@@ -22,9 +24,14 @@ public class ScreenPromptListSwitcher
         _newPromptList.SetMinElementHeightAndWidth(originalPromptList._promptElementMinHeight, originalPromptList._promptElementMinWidth);
         
         _promptManager = Locator.GetPromptManager();
-        
-        Update(); // To force not overlapping first time
-        // TODO: Restore original
+
+        Hide(_newPromptList);
+    }
+
+    public void Reset()
+    {
+        Show(_originalPromptList);
+        Hide(_newPromptList);
     }
 
     public void AddScreenPrompt(ScreenPrompt buttonPrompt)
@@ -39,19 +46,30 @@ public class ScreenPromptListSwitcher
 
     public void Update()
     {
-        if (Time.unscaledTime >= _lastSwitchTime + 5f)
+        if (Time.unscaledTime >= _lastSwitchTime + SwitchTime)
         {
             _lastSwitchTime = Time.unscaledTime;
-            if (_originalPromptList.gameObject.activeSelf)
+            // Use scale because active mess up with children somehow, they could remain invisible
+            if (_originalPromptList.transform.localScale.Equals(Vector3.one))
             {
-                _originalPromptList.gameObject.SetActive(false);
-                _newPromptList.gameObject.SetActive(true);
+                Hide(_originalPromptList);
+                Show(_newPromptList);
             }
             else
             {
-                _originalPromptList.gameObject.SetActive(true);
-                _newPromptList.gameObject.SetActive(false);
+                Show(_originalPromptList);
+                Hide(_newPromptList);
             }
         }
+    }
+
+    private void Hide(ScreenPromptList promptList)
+    {
+        promptList.transform.localScale = Vector3.zero;
+    }
+    
+    private void Show(ScreenPromptList promptList)
+    {
+        promptList.transform.localScale = Vector3.one;
     }
 }
