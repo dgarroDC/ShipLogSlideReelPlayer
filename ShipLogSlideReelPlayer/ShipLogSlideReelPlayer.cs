@@ -38,13 +38,11 @@ namespace ShipLogSlideReelPlayer
         internal void LoadReelEntries(ShipLogManager shipLogManager)
         {
             ReelEntries = new Dictionary<string, ReelShipLogEntry>();
-            string entriesFileData = File.ReadAllText(ModHelper.Manifest.ModFolderPath + "ReelEntries.xml");
-            XElement astroElement = XDocument.Parse(entriesFileData).Element("AstroObjectEntry");
-            string astroObjectID = astroElement!.Element("ID")!.Value;
+            List<ReelShipLogEntry.Data> entriesData = ModHelper.Storage.Load<List<ReelShipLogEntry.Data>>("ReelEntries.json");
             SlideCollectionContainer[] existingReels = Resources.FindObjectsOfTypeAll<SlideCollectionContainer>();
-            foreach (XElement entryNode in astroElement.Elements("Entry"))
+            foreach (ReelShipLogEntry.Data entryData in entriesData)
             {
-                string reelName = entryNode.Element("ID")!.Value;
+                string reelName = entryData.ID;
                 SlideCollectionContainer[] foundReels = existingReels.Where(reel => reel.name == reelName).ToArray();
                 if (foundReels.Length == 0)
                 {
@@ -56,7 +54,7 @@ namespace ShipLogSlideReelPlayer
                     ModHelper.Console.WriteLine("Multiple (" + foundReels.Length + ") reels with name " + reelName + " found, defaulting to the first one...",
                         MessageType.Error);
                 }
-                ReelShipLogEntry entry = new ReelShipLogEntry(astroObjectID, entryNode, foundReels[0], shipLogManager);
+                ReelShipLogEntry entry = new ReelShipLogEntry(entryData, foundReels[0], shipLogManager);
                 ReelEntries.Add(entry.GetID(), entry);
             }
         }

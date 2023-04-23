@@ -1,31 +1,34 @@
 ﻿using System;
 using UnityEngine;
-using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ShipLogSlideReelPlayer
 {
-    public class ReelShipLogEntry : ShipLogEntry
+    public class ReelShipLogEntry
     {
         private const string READ_CONDITION_PREFIX = "DGARRO_READ_REEL_";
 
         private SlideCollectionContainer _reel;
         private bool _isVision;
+        private string _id;
+        private string _name;
         private float _defaultSlideDuration;
         private List<string> _overridenByEntries;
-        
-        public ReelShipLogEntry(string astroObjectID, XElement entryNode, SlideCollectionContainer reel, ShipLogManager shipLogManager) :
-            base(astroObjectID, entryNode, entryNode.Element("DGARRO_PARENT")!.Value)
+        private ShipLogEntry.State _state; // TODO bool?
+
+        public ReelShipLogEntry(Data entryData, SlideCollectionContainer reel, ShipLogManager shipLogManager) 
         {
             _reel = CopySlideCollectionContainer(reel);
-            // TODO PRINT _invertBlackFrames???
-            
-            XElement defaultSlideDurationForVision = entryNode.Element("DGARRO_DURATION");
+
+            _id = entryData.ID;
+            _name = entryData.Name;
+
+            string defaultSlideDurationForVision = entryData.Duration;
             if (defaultSlideDurationForVision != null)
             {
                 _isVision = true;
-                _defaultSlideDuration = float.Parse(defaultSlideDurationForVision.Value, OWUtilities.owFormatProvider);
+                _defaultSlideDuration = float.Parse(defaultSlideDurationForVision, OWUtilities.owFormatProvider);
             }
             else
             {
@@ -34,26 +37,29 @@ namespace ShipLogSlideReelPlayer
             }
 
             _overridenByEntries = new List<string>();
-            foreach (XElement overridenByEntry in entryNode.Elements("DGARRO_OVERRIDEN"))
+            if (entryData.Overriden != null)
             {
-                _overridenByEntries.Add(overridenByEntry.Value);
+                foreach (string overridenByEntry in entryData.Overriden)
+                {
+                    _overridenByEntries.Add(overridenByEntry);
+                }
             }
- 
+
             InitState(reel._playWithShipLogFacts ?? Array.Empty<string>(), shipLogManager);
         }
 
         private void InitState(string[] playWithShipLogFacts, ShipLogManager shipLogManager)
         {
-            _state = State.Hidden;
+            _state = ShipLogEntry.State.Hidden;
             // The reel entries are created when a game is loaded, so it's ok to do this
             if (PlayerData.GetPersistentCondition(GetReadCondition()))
             {
-                _state = State.Explored;
+                _state = ShipLogEntry.State.Explored;
                 return;
             }
 
             if (!playWithShipLogFacts.Any(factID => shipLogManager.IsFactRevealed(factID))) return;
-            _state = State.Explored;
+            _state = ShipLogEntry.State.Explored;
             // Save even the ones with playWithShipLogFacts not empty, just in case
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
@@ -116,7 +122,7 @@ namespace ShipLogSlideReelPlayer
 
         public void CheckRead(SlideCollectionContainer realReel)
         {
-            if (_state == State.Explored)
+            if (_state == ShipLogEntry.State.Explored)
             {
                 return;
             }
@@ -128,32 +134,37 @@ namespace ShipLogSlideReelPlayer
                     return;
                 }
             }
-            _state = State.Explored;
+            _state = ShipLogEntry.State.Explored;
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
 
-        public new string GetName(bool withLineBreaks)
+        public string GetID()
+        {
+            return _id;
+        }
+
+        public string GetName()
         {
             // Color is added here to make it easier to Suit Log (not anymore tho)
             return "<color=#90FEF3>" + _name + "</color>";
         }
 
-        public new bool HasMoreToExplore()
+        public bool HasMoreToExplore()
         {
             return _overridenByEntries.Count > 0;
         }
 
-        public new State GetState()
+        public ShipLogEntry.State GetState()
         {
             if (ShipLogSlideReelPlayer.Instance.showAll)
             {
-                return State.Explored;
+                return ShipLogEntry.State.Explored;
             }
             foreach (string overridenByEntry in _overridenByEntries)
             {
-                if (ShipLogSlideReelPlayer.Instance.ReelEntries.GetValueOrDefault(overridenByEntry).GetState() == State.Explored)
+                if (ShipLogSlideReelPlayer.Instance.ReelEntries.GetValueOrDefault(overridenByEntry).GetState() == ShipLogEntry.State.Explored)
                 {
-                    return State.Hidden;
+                    return ShipLogEntry.State.Hidden;
                 }
             }
             return _state;
@@ -162,6 +173,14 @@ namespace ShipLogSlideReelPlayer
         private string GetReadCondition()
         {
             return READ_CONDITION_PREFIX + _id;
+        }
+
+        public class Data
+        {
+            public string ID;
+            public string Name;
+            public List<string> Overriden;
+            public string Duration;
         }
     }
 }

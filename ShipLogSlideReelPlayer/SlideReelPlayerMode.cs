@@ -39,7 +39,6 @@ public class SlideReelPlayerMode : ShipLogMode
 
         _oneShotSource.PlayOneShot(AudioType.Artifact_Insert);
 
-        // TODO: Get rid of ShipLogEntry extension
         _reels = ShipLogSlideReelPlayer.Instance.ReelEntries.Values
             .Where(re => re.GetState() == ShipLogEntry.State.Explored)
             .ToArray();
@@ -48,7 +47,7 @@ public class SlideReelPlayerMode : ShipLogMode
         for (int i = 0; i < _reels.Length; i++)
         {
             ReelShipLogEntry reel = _reels[i];
-            items.Add(new Tuple<string, bool, bool, bool>(reel.GetName(false), false, false, reel.HasMoreToExplore())); 
+            items.Add(new Tuple<string, bool, bool, bool>(reel.GetName(), false, false, reel.HasMoreToExplore())); 
         }
 
         itemList.SetItems(items);

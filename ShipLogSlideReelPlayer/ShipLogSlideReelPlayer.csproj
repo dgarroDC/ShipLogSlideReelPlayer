@@ -28,7 +28,7 @@
     <None Update="Assets\evilshader.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ReelEntries.xml">
+    <None Update="ReelEntries.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

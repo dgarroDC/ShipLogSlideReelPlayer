@@ -1,0 +1,151 @@
+[
+  {
+    "ID": "Prefab_IP_Reel_1_Story_Burned",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_1_Seal",
+    "Name": "Seal Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_1_LibraryPath",
+    "Name": "Secret Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_2_Story_Burned",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_2_Seal",
+    "Name": "Seal Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_2_LibraryPath",
+    "Name": "Secret Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_LanternSecret",
+    "Name": "Lanterns Room Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_3_Story_Burned",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_3_Seal",
+    "Name": "Seal Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_3_LibraryPath",
+    "Name": "Secret Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_DamageReport",
+    "Name": "Hull Breach Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_ExperimentFail",
+    "Name": "First Experiment Vision",
+    "Duration": 0.4
+  },
+  {
+    "ID": "Prefab_IP_Reel_ExperimentSuccess",
+    "Name": "Third Experiment Vision",
+    "Duration": 0.4
+  },
+  {
+    "ID": "Prefab_IP_Reel_ExperimentWatch_Burned",
+    "Name": "Experiments Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_Burning",
+    "Name": "Reels Burning Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_4_Story_Burned",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_1_Story_Complete",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_1_DreamRule",
+    "Name": "Error Report Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_2_Story_Complete",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_2_DreamRule_v1",
+    "Name": "Dying Bearer Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_2_DreamRule_v2",
+    "Name": "Error Report Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_3_Story_Complete",
+    "Name": "Story Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_3_DreamRule",
+    "Name": "Error Report Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_ExperimentWatch",
+    "Name": "Experiments Reel"
+  },
+  {
+    "ID": "Prefab_IP_Reel_PrisonPeephole_Vision",
+    "Name": "Vault Vision",
+    "Duration": 0.6
+  },
+  {
+    "ID": "Prefab_IP_Reel_TowerVision",
+    "Name": "Tower Secret Passage Vision",
+    "Duration": 0.6
+  },
+  {
+    "ID": "Prefab_IP_Reel_4_Story_Vision",
+    "Name": "Prisoner Vision",
+    "Duration": 0.7
+  },
+  {
+    "ID": "Prefab_IP_Reel_5_Story_Vision_NoInterloperNoVessel",
+    "Name": "My Vision",
+    "Overriden": [
+      "Prefab_IP_Reel_5_Story_Vision_NoInterloper",
+      "Prefab_IP_Reel_5_Story_Vision_NoVessel",
+      "Prefab_IP_Reel_5_Story_Vision_Complete"
+    ],
+    "Duration": 0.7
+  },
+  {
+    "ID": "Prefab_IP_Reel_5_Story_Vision_NoInterloper",
+    "Name": "My Vision",
+    "Overriden": [
+      "Prefab_IP_Reel_5_Story_Vision_Complete"
+    ],
+    "Duration": 0.7
+  },
+  {
+    "ID": "Prefab_IP_Reel_5_Story_Vision_NoVessel",
+    "Name": "My Vision",
+    "Overriden": [
+      "Prefab_IP_Reel_5_Story_Vision_Complete"
+    ],
+    "Duration": 0.7
+  },
+  {
+    "ID": "Prefab_IP_Reel_5_Story_Vision_Complete",
+    "Name": "My Vision",
+    "Duration": 0.7
+  },
+  {
+    "ID": "Prefab_IP_Reel_PrisonerFarewellVision",
+    "Name": "Farewell Vision",
+    "Duration": 0.7
+  }
+]

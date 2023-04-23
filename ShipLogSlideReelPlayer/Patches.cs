@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 
-// TODO: Remove a bunch of patches
 namespace ShipLogSlideReelPlayer
 {
     [HarmonyPatch]
