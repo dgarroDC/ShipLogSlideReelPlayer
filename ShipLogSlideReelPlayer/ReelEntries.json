@@ -1,27 +1,27 @@
 [
   {
     "ID": "Prefab_IP_Reel_1_Story_Burned",
-    "Name": "Story Reel"
+    "Name": "Story Reel 1"
   },
   {
     "ID": "Prefab_IP_Reel_1_Seal",
-    "Name": "Seal Reel"
+    "Name": "Seal Reel 1"
   },
   {
     "ID": "Prefab_IP_Reel_1_LibraryPath",
-    "Name": "Secret Reel"
+    "Name": "Secret Fireplace Reel"
   },
   {
     "ID": "Prefab_IP_Reel_2_Story_Burned",
-    "Name": "Story Reel"
+    "Name": "Story Reel 2"
   },
   {
     "ID": "Prefab_IP_Reel_2_Seal",
-    "Name": "Seal Reel"
+    "Name": "Seal Reel 2"
   },
   {
     "ID": "Prefab_IP_Reel_2_LibraryPath",
-    "Name": "Secret Reel"
+    "Name": "Secret Well Reel"
   },
   {
     "ID": "Prefab_IP_Reel_LanternSecret",
@@ -29,15 +29,15 @@
   },
   {
     "ID": "Prefab_IP_Reel_3_Story_Burned",
-    "Name": "Story Reel"
+    "Name": "Story Reel 3"
   },
   {
     "ID": "Prefab_IP_Reel_3_Seal",
-    "Name": "Seal Reel"
+    "Name": "Seal Reel 3"
   },
   {
     "ID": "Prefab_IP_Reel_3_LibraryPath",
-    "Name": "Secret Reel"
+    "Name": "Secret Mural Reel"
   },
   {
     "ID": "Prefab_IP_Reel_DamageReport",
@@ -63,19 +63,19 @@
   },
   {
     "ID": "Prefab_IP_Reel_4_Story_Burned",
-    "Name": "Story Reel"
+    "Name": "Story Reel 4"
   },
   {
     "ID": "Prefab_IP_Reel_1_Story_Complete",
-    "Name": "Story Reel"
+    "Name": "Intact Story Reel 1"
   },
   {
     "ID": "Prefab_IP_Reel_1_DreamRule",
-    "Name": "Error Report Reel"
+    "Name": "Transition Error Report Reel"
   },
   {
     "ID": "Prefab_IP_Reel_2_Story_Complete",
-    "Name": "Story Reel"
+    "Name": "Intact Story Reel 2"
   },
   {
     "ID": "Prefab_IP_Reel_2_DreamRule_v1",
@@ -83,19 +83,19 @@
   },
   {
     "ID": "Prefab_IP_Reel_2_DreamRule_v2",
-    "Name": "Error Report Reel"
+    "Name": "Alarm Bell Error Report Reel"
   },
   {
     "ID": "Prefab_IP_Reel_3_Story_Complete",
-    "Name": "Story Reel"
+    "Name": "Intact Story Reel 3"
   },
   {
     "ID": "Prefab_IP_Reel_3_DreamRule",
-    "Name": "Error Report Reel"
+    "Name": "Projection Error Report Reel"
   },
   {
     "ID": "Prefab_IP_Reel_ExperimentWatch",
-    "Name": "Experiments Reel"
+    "Name": "Intact Experiments Reel"
   },
   {
     "ID": "Prefab_IP_Reel_PrisonPeephole_Vision",
