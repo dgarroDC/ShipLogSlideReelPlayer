@@ -147,7 +147,7 @@ namespace ShipLogSlideReelPlayer
         public string GetName()
         {
             // Color is added here to make it easier to Suit Log (not anymore tho)
-            return "<color=#90FEF3>" + _name + "</color>";
+            return WithColor(_name);
         }
 
         public bool HasMoreToExplore()
@@ -175,6 +175,11 @@ namespace ShipLogSlideReelPlayer
         private string GetReadCondition()
         {
             return READ_CONDITION_PREFIX + _id;
+        }
+
+        public static string WithColor(string text)
+        {
+            return "<color=#90FEF3>" + text + "</color>";
         }
 
         public class Data

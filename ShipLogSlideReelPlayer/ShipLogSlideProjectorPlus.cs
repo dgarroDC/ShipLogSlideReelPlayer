@@ -241,7 +241,6 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        // TODO: Rename, eventually...
         public void OnEntrySelected(ReelShipLogEntry[] entries, int index)
         {
             RemoveReel();

@@ -20,7 +20,6 @@ namespace ShipLogSlideReelPlayer
         public Shader evilShader;
 
         public bool showAll;
-        public bool _thing = true;
 
         private void Start()
         {
@@ -66,11 +65,8 @@ namespace ShipLogSlideReelPlayer
             customShipLogModesAPI.ItemListMake(true, itemList =>
             {
                 SlideReelPlayerMode reelPlayerMode = itemList.gameObject.AddComponent<SlideReelPlayerMode>();
-                reelPlayerMode.itemList = new ItemListWrapper(customShipLogModesAPI, itemList);
-                // TODO: Enabled if >= 1 explored reel
-                reelPlayerMode.gameObject.name = nameof(SlideReelPlayerMode);
-                ModHelper.Console.WriteLine(reelPlayerMode.ToString());
-                customShipLogModesAPI.AddMode(reelPlayerMode, () => _thing, () => SlideReelPlayerMode.Name);
+                reelPlayerMode.itemList = new ItemListWrapper(customShipLogModesAPI, itemList); reelPlayerMode.gameObject.name = nameof(SlideReelPlayerMode);
+                customShipLogModesAPI.AddMode(reelPlayerMode, () => true, () => SlideReelPlayerMode.Name);
             });
         }
 

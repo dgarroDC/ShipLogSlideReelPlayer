@@ -26,11 +26,9 @@ public class SlideReelPlayerMode : ShipLogMode
 
         itemList.SetName(Name);
 
-        // Enable because by default it's disabled
-        Image photo = itemList.GetPhoto();
-        photo.gameObject.SetActive(true); // By default it's disabled
-
-        _reelProjector = new ShipLogSlideProjectorPlus(photo, _upperRightPromptList);
+        itemList.GetQuestionMark().text = ReelShipLogEntry.WithColor("?");
+        
+        _reelProjector = new ShipLogSlideProjectorPlus(itemList.GetPhoto(), _upperRightPromptList);
     }
 
     public override void EnterMode(string entryID = "", List<ShipLogFact> revealQueue = null)
@@ -51,10 +49,25 @@ public class SlideReelPlayerMode : ShipLogMode
         }
 
         itemList.SetItems(items);
-        itemList.SetSelectedIndex(0); // TODO: Remember selection? Take into consideration that new reels could be discovered
-        OnItemSelected();
+        if (_reels.Length > 0)
+        {
+            itemList.GetPhoto().gameObject.SetActive(true);
+            itemList.GetQuestionMark().gameObject.SetActive(false);
 
-        _reelProjector.AddPrompts();
+            itemList.SetSelectedIndex(0); // TODO: Remember selection? Take into consideration that new reels could be discovered
+            // Description field already cleared here
+            OnItemSelected();
+            _reelProjector.AddPrompts();
+        }
+        else
+        {
+            itemList.GetPhoto().gameObject.SetActive(false);
+            itemList.GetQuestionMark().gameObject.SetActive(true);
+
+            itemList.DescriptionFieldClear();
+            // TODO: Translation
+            itemList.DescriptionFieldGetNextItem().DisplayText("No slide reels watched.");
+        }
     }
 
     private void OnItemSelected()
@@ -72,6 +85,7 @@ public class SlideReelPlayerMode : ShipLogMode
 
     public override void UpdateMode()
     {
+        // Important to call UpdateList even with empty list!
         if (itemList.UpdateList() != 0)
         {
             OnItemSelected();
@@ -83,11 +97,13 @@ public class SlideReelPlayerMode : ShipLogMode
     {
         itemList.DescriptionFieldClear(); // Just in case...
         itemList.Close();
+        if (_reels.Length == 0) return; // Probably works without this...
+
         _reelProjector.RemoveReel();
         _reelProjector.RemovePrompts();
         ShipLogSlideReelPlayer.Instance.UnloadAllTextures();
         // Note: Texture aren't unloaded while the game is paused (StreamingIteratedTextureAssetBundle.Update())
-        // textured unloaded by updating slide index are, meaning that up to 5*#Reels textures could be loaded
+        // textured unloaded by updating slide index are, meaning that up to 5*#Reels textures could be loaded   
     }
 
     public override void OnEnterComputer()
