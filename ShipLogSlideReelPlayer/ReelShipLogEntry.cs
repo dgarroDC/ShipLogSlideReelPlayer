@@ -15,7 +15,7 @@ namespace ShipLogSlideReelPlayer
         private string _name;
         private float _defaultSlideDuration;
         private List<string> _overridenByEntries;
-        private ShipLogEntry.State _state; // TODO bool?
+        private bool _read;
 
         public ReelShipLogEntry(Data entryData, SlideCollectionContainer reel, ShipLogManager shipLogManager) 
         {
@@ -50,16 +50,16 @@ namespace ShipLogSlideReelPlayer
 
         private void InitState(string[] playWithShipLogFacts, ShipLogManager shipLogManager)
         {
-            _state = ShipLogEntry.State.Hidden;
+            _read = false;
             // The reel entries are created when a game is loaded, so it's ok to do this
             if (PlayerData.GetPersistentCondition(GetReadCondition()))
             {
-                _state = ShipLogEntry.State.Explored;
+                _read = true;
                 return;
             }
 
             if (!playWithShipLogFacts.Any(factID => shipLogManager.IsFactRevealed(factID))) return;
-            _state = ShipLogEntry.State.Explored;
+            _read = true;
             // Save even the ones with playWithShipLogFacts not empty, just in case
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
@@ -122,7 +122,7 @@ namespace ShipLogSlideReelPlayer
 
         public void CheckRead(SlideCollectionContainer realReel)
         {
-            if (_state == ShipLogEntry.State.Explored)
+            if (_read)
             {
                 return;
             }
@@ -134,7 +134,8 @@ namespace ShipLogSlideReelPlayer
                     return;
                 }
             }
-            _state = ShipLogEntry.State.Explored;
+
+            _read = true;
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
 
@@ -154,20 +155,21 @@ namespace ShipLogSlideReelPlayer
             return _overridenByEntries.Count > 0;
         }
 
-        public ShipLogEntry.State GetState()
+        public bool ShouldShow()
         {
             if (ShipLogSlideReelPlayer.Instance.showAll)
             {
-                return ShipLogEntry.State.Explored;
+                return true;
             }
             foreach (string overridenByEntry in _overridenByEntries)
             {
-                if (ShipLogSlideReelPlayer.Instance.ReelEntries.GetValueOrDefault(overridenByEntry).GetState() == ShipLogEntry.State.Explored)
+                if (ShipLogSlideReelPlayer.Instance.ReelEntries.GetValueOrDefault(overridenByEntry)._read)
                 {
-                    return ShipLogEntry.State.Hidden;
+                    // TODO: Test this case
+                    return false;
                 }
             }
-            return _state;
+            return _read;
         }
 
         private string GetReadCondition()

@@ -40,7 +40,7 @@ public class SlideReelPlayerMode : ShipLogMode
         _oneShotSource.PlayOneShot(AudioType.Artifact_Insert);
 
         _reels = ShipLogSlideReelPlayer.Instance.ReelEntries.Values
-            .Where(re => re.GetState() == ShipLogEntry.State.Explored)
+            .Where(re => re.ShouldShow())
             .ToArray();
 
         List<Tuple<string, bool, bool, bool>> items = new();
