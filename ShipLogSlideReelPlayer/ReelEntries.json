@@ -13,12 +13,12 @@
   },
   {
     "ID": "Prefab_IP_Reel_4_Story_Vision",
-    "Name": "Prisoner Vision",
+    "Name": "Prisoner Story Vision",
     "Duration": 0.7
   },
   {
     "ID": "Prefab_IP_Reel_5_Story_Vision_NoInterloperNoVessel",
-    "Name": "My Vision",
+    "Name": "My Story Vision",
     "Overriden": [
       "Prefab_IP_Reel_5_Story_Vision_NoInterloper",
       "Prefab_IP_Reel_5_Story_Vision_NoVessel",
@@ -28,7 +28,7 @@
   },
   {
     "ID": "Prefab_IP_Reel_5_Story_Vision_NoInterloper",
-    "Name": "My Vision",
+    "Name": "My Story Vision",
     "Overriden": [
       "Prefab_IP_Reel_5_Story_Vision_Complete"
     ],
@@ -36,7 +36,7 @@
   },
   {
     "ID": "Prefab_IP_Reel_5_Story_Vision_NoVessel",
-    "Name": "My Vision",
+    "Name": "My Story Vision",
     "Overriden": [
       "Prefab_IP_Reel_5_Story_Vision_Complete"
     ],
@@ -44,7 +44,7 @@
   },
   {
     "ID": "Prefab_IP_Reel_5_Story_Vision_Complete",
-    "Name": "My Vision",
+    "Name": "My Story Vision",
     "Duration": 0.7
   },
   {
