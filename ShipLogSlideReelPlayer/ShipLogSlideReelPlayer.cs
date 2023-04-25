@@ -65,7 +65,8 @@ namespace ShipLogSlideReelPlayer
             customShipLogModesAPI.ItemListMake(true, itemList =>
             {
                 SlideReelPlayerMode reelPlayerMode = itemList.gameObject.AddComponent<SlideReelPlayerMode>();
-                reelPlayerMode.itemList = new ItemListWrapper(customShipLogModesAPI, itemList); reelPlayerMode.gameObject.name = nameof(SlideReelPlayerMode);
+                reelPlayerMode.itemList = new ItemListWrapper(customShipLogModesAPI, itemList); 
+                reelPlayerMode.gameObject.name = nameof(SlideReelPlayerMode);
                 customShipLogModesAPI.AddMode(reelPlayerMode, () => true, () => SlideReelPlayerMode.Name);
             });
         }
