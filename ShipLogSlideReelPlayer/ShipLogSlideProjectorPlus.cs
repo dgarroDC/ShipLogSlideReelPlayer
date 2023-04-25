@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
@@ -14,6 +13,7 @@ namespace ShipLogSlideReelPlayer
         private bool _autoPlaying;
         private float _lastSlidePlayTime;
 
+        private ScreenPromptListSwitcher _promptListSwitcher;
         private ScreenPrompt _playPrompt;
         private ScreenPrompt _forwardPrompt;
         private ScreenPrompt _reversePrompt;
@@ -21,24 +21,24 @@ namespace ShipLogSlideReelPlayer
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
 
-        public ShipLogSlideProjectorPlus(ShipLogMapMode mapMode)
+        public ShipLogSlideProjectorPlus(Image photo, ScreenPromptList promptList)
         {
-            _photo = mapMode._photo;
+            // TODO: Can I use  texture = collection[this._slideIndex]._image;? What is image? Or _firstSlideStandIn???
+            _photo = photo;
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
+            _promptListSwitcher = new ScreenPromptListSwitcher(promptList);
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
-            
-            Locator.GetPromptManager().AddScreenPrompt(_playPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_forwardPrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
-            Locator.GetPromptManager().AddScreenPrompt(_reversePrompt, mapMode._upperRightPromptList, TextAnchor.MiddleRight);
         }
         
         public void Update()
         {
             UpdatePromptsVisibility();
+            _promptListSwitcher.Update();
+            
             if (!IsReelPlaced()) return;
             if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
             {
@@ -92,11 +92,27 @@ namespace ShipLogSlideReelPlayer
         }
 
         private void UpdatePromptsVisibility()
-        {
-            _playPrompt.SetVisibility(IsReelPlaced());
+        { 
             _playPrompt.SetText(_autoPlaying ? "Stop" : "Play");
-            _forwardPrompt.SetVisibility(IsReelPlaced() && !_autoPlaying);
-            _reversePrompt.SetVisibility(IsReelPlaced() && !_autoPlaying);
+            _forwardPrompt.SetVisibility(!_autoPlaying);
+            _reversePrompt.SetVisibility(!_autoPlaying);
+        }
+
+        public void AddPrompts()
+        {
+            _promptListSwitcher.AddScreenPrompt(_playPrompt);
+            _promptListSwitcher.AddScreenPrompt(_forwardPrompt);
+            _promptListSwitcher.AddScreenPrompt(_reversePrompt);
+            _playPrompt.SetVisibility(true); // This is always visible
+        }
+
+        public void RemovePrompts()
+        {
+            // We probably could keep them on our list, but idk
+            _promptListSwitcher.RemoveScreenPrompt(_playPrompt);
+            _promptListSwitcher.RemoveScreenPrompt(_forwardPrompt);
+            _promptListSwitcher.RemoveScreenPrompt(_reversePrompt);
+            _promptListSwitcher.Reset();
         }
 
         public void PlaceReel(SlideCollectionContainer reel, bool isVision, float defaultSlideDuration)
@@ -111,10 +127,6 @@ namespace ShipLogSlideReelPlayer
             OnSlideTextureUpdated();
             _playing = false;
             _autoPlaying = false;
-
-            _forwardPrompt.SetVisibility(true);
-            _reversePrompt.SetVisibility(true);
-            _playPrompt.SetVisibility(true);
 
             if (!_isVision)
             {
@@ -144,10 +156,6 @@ namespace ShipLogSlideReelPlayer
                 _reel.enabled = false;
                 _reel = null;
                 _playing = false;
-
-                _forwardPrompt.SetVisibility(false);
-                _reversePrompt.SetVisibility(false);
-                _playPrompt.SetVisibility(false);
             }
         }
   
@@ -233,41 +241,23 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
-        public void OnEntrySelected(ShipLogEntryListItem[] entries, int index, int entryCount)
+        public void OnEntrySelected(ReelShipLogEntry[] entries, int index)
         {
             RemoveReel();
-            ShipLogEntry entry = entries[index].GetEntry();
-            if (entry is ReelShipLogEntry reelEntry)
-            {
-                // Loading the textures is probably only necessary in case no real entries are revealed,
-                // and so the first entry is a reel entry (with textures no loaded when focusing on an neighbor)
-                reelEntry.PlaceReelOnProjector(this);
-                reelEntry.LoadStreamingTextures();
-            }
-            else
-            {
-                // Don't restore the material every time we remove a reel,
-                // otherwise changing to rumor mode or map we would briefly see the inverted reel textures
-                // Placing a vision reel also restore the material in the other branch
-                RestoreOriginalMaterial();
-            }
+            ReelShipLogEntry selected = entries[index];
+            selected.PlaceReelOnProjector(this);
+            selected.LoadStreamingTextures();
 
             // Load textures of neighbors to avoid delay with white photo when displaying the entry
+            int entryCount = entries.Length;
             if (entryCount >= 2)
             {
-                ShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)].GetEntry();
-                if (prevEntry is ReelShipLogEntry prevReelEntry)
-                {
-                    prevReelEntry.LoadStreamingTextures();
-                }
-
+                ReelShipLogEntry prevEntry = entries[Mod(index - 1, entryCount)];
+                prevEntry.LoadStreamingTextures();
                 if (entryCount >= 3)
                 {
-                    ShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)].GetEntry();
-                    if (nextEntry is ReelShipLogEntry nextReelEntry)
-                    {
-                        nextReelEntry.LoadStreamingTextures();
-                    }
+                    ReelShipLogEntry nextEntry = entries[Mod(index + 1, entryCount)];
+                    nextEntry.LoadStreamingTextures();
                 }
             }
         }
