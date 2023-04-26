@@ -2,7 +2,7 @@
 
 Play Echoes of the Eye slide reels in your Ship Log computer with an enhanced player!
 
-![thumbnail](images/thumbnail.webp)
+![thumbnail](images/thumbnail.png)
 
 This mod adds a new [custom mode](https://outerwildsmods.com/mods/customshiplogmodes/) to the Ship Log: The Slide Reel Player Mode. It allows you to browse and play the reels and visions that you watched in the game.
 
