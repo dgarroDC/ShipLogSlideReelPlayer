@@ -70,4 +70,14 @@ public class ItemListWrapper
     {
         return _api.ItemListDescriptionFieldGetNextItem(_itemList);
     }
+
+    public void MarkHUDRootEnable(bool enable)
+    {
+        _api.ItemListMarkHUDRootEnable(_itemList, enable);
+    }
+
+    public ScreenPromptList MarkHUDGetPromptList()
+    {
+        return _api.ItemListMarkHUDGetPromptList(_itemList);
+    }
 }
