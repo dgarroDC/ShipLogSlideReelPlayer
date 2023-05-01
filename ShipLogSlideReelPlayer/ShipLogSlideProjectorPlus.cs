@@ -1,4 +1,5 @@
-﻿using Unity.Jobs;
+﻿using System.Collections.Generic;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,7 @@ namespace ShipLogSlideReelPlayer
         private float _defaultSlideDuration;
         private bool _autoPlaying;
         private float _lastSlidePlayTime;
+        private HashSet<int> _burntSlides = new();
 
         private ScreenPromptListSwitcher _promptListSwitcher;
         private ScreenPrompt _playPrompt;
@@ -94,6 +96,21 @@ namespace ShipLogSlideReelPlayer
             }
         }
 
+        private void BuildBurntSlides()
+        {
+            _burntSlides.Clear();
+            foreach (SlideCollectionContainer.SlideMusicRange musicRange in _reel._musicRanges)
+            {
+                if (musicRange.audioType == AudioType.Reel_Backdrop_Burnt)
+                {
+                    for (int i = musicRange.start; i <= musicRange.end; i++)
+                    {
+                        _burntSlides.Add(i);
+                    }
+                }
+            }
+        }
+
         private void UpdateSlideCounter()
         {
             string progressBar = "[";
@@ -101,14 +118,21 @@ namespace ShipLogSlideReelPlayer
             int count = _reel.slideCount;
             for (int i = 0; i < count; i++)
             {
+                string nextSlideSymbol;
                 if (i == index)
                 {
-                    progressBar += "*";
+                    nextSlideSymbol = "*";
                 }
                 else
                 {
-                    progressBar += "=";
+                    nextSlideSymbol = "=";
                 }
+
+                if (_burntSlides.Contains(i))
+                {
+                    nextSlideSymbol = "<color=orange>" + nextSlideSymbol + "</color>";
+                }
+                progressBar += nextSlideSymbol;
             }
             progressBar += "]";
             progressBar = ShipLogSlideReelPlayer.WithGreenColor(progressBar);
@@ -166,6 +190,7 @@ namespace ShipLogSlideReelPlayer
                 RestoreOriginalMaterial();
             }
 
+            BuildBurntSlides();
             UpdateSlideCounter();
         }
 
@@ -276,8 +301,8 @@ namespace ShipLogSlideReelPlayer
         {
             RemoveReel();
             ReelShipLogEntry selected = entries[index];
-            selected.PlaceReelOnProjector(this);
             selected.LoadStreamingTextures();
+            selected.PlaceReelOnProjector(this);
 
             // Load textures of neighbors to avoid delay with white photo when displaying the entry
             int entryCount = entries.Length;
