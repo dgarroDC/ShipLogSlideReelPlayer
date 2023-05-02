@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -121,7 +120,7 @@ namespace ShipLogSlideReelPlayer
                 string nextSlideSymbol;
                 if (i == index)
                 {
-                    nextSlideSymbol = "*";
+                    nextSlideSymbol = "¤";
                 }
                 else
                 {
