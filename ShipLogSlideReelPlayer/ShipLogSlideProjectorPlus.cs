@@ -24,7 +24,6 @@ namespace ShipLogSlideReelPlayer
 
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
-        private readonly FullScreenProjection _fullScreenProjection;
 
         public ShipLogSlideProjectorPlus(Image photo, ScreenPromptList promptList)
         {
@@ -37,9 +36,6 @@ namespace ShipLogSlideReelPlayer
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
-
-            _fullScreenProjection = Locator.GetPlayerCamera().gameObject.AddComponent<FullScreenProjection>();
-            _fullScreenProjection.enabled = false;
         }
         
         public void Update()
@@ -48,6 +44,9 @@ namespace ShipLogSlideReelPlayer
             _promptListSwitcher.Update();
             
             if (!IsReelPlaced()) return;
+            
+            ShipLogSlideReelPlayer.Instance._fullScreenImage.gameObject.SetActive(_autoPlaying);
+            
             if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
             {
                 if (!_autoPlaying)
@@ -64,8 +63,6 @@ namespace ShipLogSlideReelPlayer
                 {
                     _autoPlaying = false;
                 }
-
-                _fullScreenProjection.enabled = _autoPlaying;
                 return;
             }
 
@@ -188,6 +185,7 @@ namespace ShipLogSlideReelPlayer
                 if (_photo.material != _invertPhotoMaterial)
                 {
                     _photo.material = _invertPhotoMaterial;
+                    ShipLogSlideReelPlayer.Instance._fullScreenImage.material = _invertPhotoMaterial;
                 }
             }
             else
@@ -224,8 +222,7 @@ namespace ShipLogSlideReelPlayer
                 if (texture != null)
                 {
                     _photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                    _fullScreenProjection.slideTexture = texture;
-                    _fullScreenProjection.material = _isVision? _originalPhotoMaterial : _invertPhotoMaterial;
+                    ShipLogSlideReelPlayer.Instance._fullScreenImage.sprite = _photo.sprite;
                 }
             }
         }
@@ -301,6 +298,7 @@ namespace ShipLogSlideReelPlayer
             if (_photo.material != _originalPhotoMaterial)
             {
                 _photo.material = _originalPhotoMaterial;
+                ShipLogSlideReelPlayer.Instance._fullScreenImage.material = _originalPhotoMaterial; // TODO Force first time?
             }
         }
 

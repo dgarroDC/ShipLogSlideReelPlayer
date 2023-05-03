@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using ShipLogSlideReelPlayer.CustomShipLogModes;
+using UnityEngine.UI;
 
 namespace ShipLogSlideReelPlayer
 {
@@ -20,6 +21,7 @@ namespace ShipLogSlideReelPlayer
         public Shader evilShader;
 
         public bool showAll;
+        public Image _fullScreenImage;
 
         private void Start()
         {
@@ -60,6 +62,14 @@ namespace ShipLogSlideReelPlayer
 
         public void CreateMode()
         {
+            GameObject fullScreenCanvas = new GameObject("ShipLogSlideReelPlayerFullScreenCanvas", typeof(Canvas), typeof(Image));
+            Canvas canvas = fullScreenCanvas.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _fullScreenImage = fullScreenCanvas.GetComponent<Image>();
+            _fullScreenImage.preserveAspect = true;
+            _fullScreenImage.gameObject.SetActive(false);
+
+
             ICustomShipLogModesAPI customShipLogModesAPI = ModHelper.Interaction.TryGetModApi<ICustomShipLogModesAPI>("dgarro.CustomShipLogModes");
             
             customShipLogModesAPI.ItemListMake(true, true, itemList =>
