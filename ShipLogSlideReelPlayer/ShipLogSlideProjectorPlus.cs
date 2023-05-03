@@ -44,8 +44,12 @@ namespace ShipLogSlideReelPlayer
             _promptListSwitcher.Update();
             
             if (!IsReelPlaced()) return;
-            
-            ShipLogSlideReelPlayer.Instance._fullScreenImage.gameObject.SetActive(_autoPlaying);
+
+            if (OWInput.IsNewlyPressed(InputLibrary.autopilot))
+            {
+                ShipLogSlideReelPlayer.Instance._fullScreenImage.transform.parent.gameObject.SetActive(
+                    !ShipLogSlideReelPlayer.Instance._fullScreenImage.transform.parent.gameObject.activeSelf);
+            }
             
             if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
             {
