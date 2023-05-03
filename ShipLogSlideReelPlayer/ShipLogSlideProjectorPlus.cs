@@ -24,6 +24,7 @@ namespace ShipLogSlideReelPlayer
 
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
+        private readonly FullScreenProjection _fullScreenProjection;
 
         public ShipLogSlideProjectorPlus(Image photo, ScreenPromptList promptList)
         {
@@ -36,6 +37,9 @@ namespace ShipLogSlideReelPlayer
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
+
+            _fullScreenProjection = Locator.GetPlayerCamera().gameObject.AddComponent<FullScreenProjection>();
+            _fullScreenProjection.enabled = false;
         }
         
         public void Update()
@@ -60,6 +64,8 @@ namespace ShipLogSlideReelPlayer
                 {
                     _autoPlaying = false;
                 }
+
+                _fullScreenProjection.enabled = _autoPlaying;
                 return;
             }
 
@@ -218,6 +224,8 @@ namespace ShipLogSlideReelPlayer
                 if (texture != null)
                 {
                     _photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                    _fullScreenProjection.slideTexture = texture;
+                    _fullScreenProjection.material = _isVision? _originalPhotoMaterial : _invertPhotoMaterial;
                 }
             }
         }
