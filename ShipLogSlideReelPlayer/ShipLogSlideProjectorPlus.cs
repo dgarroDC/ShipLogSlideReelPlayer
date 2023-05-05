@@ -16,6 +16,7 @@ namespace ShipLogSlideReelPlayer
         private bool _autoPlaying;
         private float _lastSlidePlayTime;
         private HashSet<int> _burntSlides = new();
+        private readonly FullScreenProjectionCanvas _fullScreen;
 
         private ScreenPromptListSwitcher _promptListSwitcher;
         private ScreenPrompt _playPrompt;
@@ -36,6 +37,8 @@ namespace ShipLogSlideReelPlayer
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
+
+            _fullScreen = new FullScreenProjectionCanvas();
         }
         
         public void Update()
@@ -47,8 +50,7 @@ namespace ShipLogSlideReelPlayer
 
             if (OWInput.IsNewlyPressed(InputLibrary.autopilot))
             {
-                ShipLogSlideReelPlayer.Instance._fullScreenImage.transform.parent.gameObject.SetActive(
-                    !ShipLogSlideReelPlayer.Instance._fullScreenImage.transform.parent.gameObject.activeSelf);
+                _fullScreen.Display(!_fullScreen.IsDisplayed());
             }
             
             if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
@@ -189,7 +191,7 @@ namespace ShipLogSlideReelPlayer
                 if (_photo.material != _invertPhotoMaterial)
                 {
                     _photo.material = _invertPhotoMaterial;
-                    ShipLogSlideReelPlayer.Instance._fullScreenImage.material = _invertPhotoMaterial;
+                    _fullScreen.GetImage().material = _invertPhotoMaterial;
                 }
             }
             else
@@ -226,7 +228,7 @@ namespace ShipLogSlideReelPlayer
                 if (texture != null)
                 {
                     _photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                    ShipLogSlideReelPlayer.Instance._fullScreenImage.sprite = _photo.sprite;
+                    _fullScreen.GetImage().sprite = _photo.sprite;
                 }
             }
         }
@@ -302,7 +304,7 @@ namespace ShipLogSlideReelPlayer
             if (_photo.material != _originalPhotoMaterial)
             {
                 _photo.material = _originalPhotoMaterial;
-                ShipLogSlideReelPlayer.Instance._fullScreenImage.material = _originalPhotoMaterial; // TODO Force first time?
+                _fullScreen.GetImage().material = _originalPhotoMaterial; // TODO Force first time?
             }
         }
 

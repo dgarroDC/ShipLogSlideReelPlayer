@@ -21,7 +21,6 @@ namespace ShipLogSlideReelPlayer
         public Shader evilShader;
 
         public bool showAll;
-        public Image _fullScreenImage;
 
         private void Start()
         {
@@ -62,25 +61,6 @@ namespace ShipLogSlideReelPlayer
 
         public void CreateMode()
         {
-            GameObject fullScreenCanvas = new GameObject("ShipLogSlideReelPlayerFullScreenCanvas", typeof(Canvas), typeof(Image));
-            Canvas canvas = fullScreenCanvas.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            Image image = fullScreenCanvas.GetComponent<Image>();
-            image.color = Color.black;
-
-            GameObject fullScreenImage = new GameObject("Image", typeof(Image));
-            fullScreenImage.transform.SetParent(fullScreenCanvas.transform);
-            _fullScreenImage = fullScreenImage.GetComponent<Image>();
-            _fullScreenImage.preserveAspect = true;
-
-            RectTransform imageRectTransform = fullScreenImage.GetComponent<RectTransform>();
-            imageRectTransform.anchoredPosition = new Vector2(0, 0);
-            imageRectTransform.anchorMin = new Vector2(0, 0);
-            imageRectTransform.anchorMax = new Vector2(1, 1);
-            imageRectTransform.sizeDelta = new Vector2(0, 0);
-            _fullScreenImage.transform.parent.gameObject.SetActive(false);
-
-
             ICustomShipLogModesAPI customShipLogModesAPI = ModHelper.Interaction.TryGetModApi<ICustomShipLogModesAPI>("dgarro.CustomShipLogModes");
             
             customShipLogModesAPI.ItemListMake(true, true, itemList =>
