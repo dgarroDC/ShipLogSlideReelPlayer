@@ -8,7 +8,7 @@ This mod adds a new [custom mode](https://outerwildsmods.com/mods/customshiplogm
 
 The game already displays them when regular entries are selected in the vanilla Map Mode and Rumor Mode of the Ship Log if they have facts referring to them, but the Reel Player Plus includes additional features:
 * In addition to play the reel/vision automatically (similar to a vision), you can also manually go to the next or previous slide (similar to the slide projector).
-* There's an option to view all reels/visions in fullscreen and the controls described above are also available in this mode. Note that this a non-diegetic feature: it isn't fullscreen on the in-game computer, it's fullscreen in your monitor (or game window), allowing you to appreciate the reels in all their glory and without being affected by lights from the game world.
+* There's an option to view all reels/visions in fullscreen and the controls described above are also available in this mode. Note that this a non-diegetic feature: it isn't fullscreen on the in-game computer, it's fullscreen on your monitor (or game window), allowing you to appreciate the reels in all their glory and without being affected by lights from the game world, offering a more CINEMATIC experience.
 * The images are displayed in full color.
 * Visions doesn't include the round vignette, the full textures are shown.
 * Music is also reproduced!
