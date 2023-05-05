@@ -3,7 +3,7 @@
     "author": "Damián Garro",
     "name": "Ship Log Slide Reel Player Plus",
     "uniqueName": "dgarro.ShipLogSlideReelPlayer",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "owmlVersion": "2.7.2",
     "dependencies": [ "dgarro.CustomShipLogModes" ]
 }
