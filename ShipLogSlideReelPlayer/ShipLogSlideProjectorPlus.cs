@@ -19,6 +19,7 @@ namespace ShipLogSlideReelPlayer
         private readonly FullScreenProjectionCanvas _fullScreen;
 
         private ScreenPromptListSwitcher _promptListSwitcher;
+        private readonly ScreenPrompt _fullScreenPrompt;
         private ScreenPrompt _playPrompt;
         private ScreenPrompt _forwardPrompt;
         private ScreenPrompt _reversePrompt;
@@ -34,11 +35,14 @@ namespace ShipLogSlideReelPlayer
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
             _promptListSwitcher = new ScreenPromptListSwitcher(promptList);
+            // TODO: Translation
+            _fullScreenPrompt = new ScreenPrompt(InputLibrary.map, "Fullscreen");
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");
             _forwardPrompt = new ScreenPrompt(InputLibrary.toolActionPrimary, UITextLibrary.GetString(UITextType.SlideProjectorForwardPrompt));
             _reversePrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, UITextLibrary.GetString(UITextType.SlideProjectorReversePrompt));
 
             _fullScreen = new FullScreenProjectionCanvas();
+            _fullScreen.GetImage().material = _originalPhotoMaterial; // Maybe we should use its own original material idk, maybe it's the same
         }
         
         public void Update()
@@ -48,9 +52,13 @@ namespace ShipLogSlideReelPlayer
             
             if (!IsReelPlaced()) return;
 
-            if (OWInput.IsNewlyPressed(InputLibrary.autopilot))
+            if (OWInput.IsNewlyPressed(InputLibrary.map))
             {
                 _fullScreen.Display(!_fullScreen.IsDisplayed());
+            }
+            else if (OWInput.IsNewlyPressed(InputLibrary.pause))
+            {
+                _fullScreen.Display(false);
             }
             
             if (OWInput.IsNewlyPressed(InputLibrary.markEntryOnHUD))
@@ -157,15 +165,19 @@ namespace ShipLogSlideReelPlayer
 
         public void AddPrompts()
         {
+            _promptListSwitcher.AddScreenPrompt(_fullScreenPrompt);
             _promptListSwitcher.AddScreenPrompt(_playPrompt);
             _promptListSwitcher.AddScreenPrompt(_forwardPrompt);
             _promptListSwitcher.AddScreenPrompt(_reversePrompt);
-            _playPrompt.SetVisibility(true); // This is always visible
+            // These are always visible
+            _fullScreenPrompt.SetVisibility(true);
+            _playPrompt.SetVisibility(true);
         }
 
         public void RemovePrompts()
         {
             // We probably could keep them on our list, but idk
+            _promptListSwitcher.RemoveScreenPrompt(_fullScreenPrompt);
             _promptListSwitcher.RemoveScreenPrompt(_playPrompt);
             _promptListSwitcher.RemoveScreenPrompt(_forwardPrompt);
             _promptListSwitcher.RemoveScreenPrompt(_reversePrompt);
@@ -218,6 +230,11 @@ namespace ShipLogSlideReelPlayer
                 _reel = null;
                 _playing = false;
             }
+
+            if (_fullScreen.IsDisplayed())
+            {
+                _fullScreen.Display(false);
+            }
         }
   
         private void OnSlideTextureUpdated()
@@ -227,8 +244,9 @@ namespace ShipLogSlideReelPlayer
                 Texture2D texture = _reel.GetCurrentSlideTexture() as Texture2D;
                 if (texture != null)
                 {
-                    _photo.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                    _fullScreen.GetImage().sprite = _photo.sprite;
+                    Sprite slideSprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                    _photo.sprite = slideSprite;
+                    _fullScreen.GetImage().sprite = slideSprite;
                 }
             }
         }
@@ -304,7 +322,7 @@ namespace ShipLogSlideReelPlayer
             if (_photo.material != _originalPhotoMaterial)
             {
                 _photo.material = _originalPhotoMaterial;
-                _fullScreen.GetImage().material = _originalPhotoMaterial; // TODO Force first time?
+                _fullScreen.GetImage().material = _originalPhotoMaterial;
             }
         }
 
