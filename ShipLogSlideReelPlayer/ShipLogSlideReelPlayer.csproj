@@ -13,7 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="OWML" Version="2.7.2" />
-    <PackageReference Include="OuterWildsGameLibs" Version="1.1.13.393" />
+    <PackageReference Include="OuterWildsGameLibs" Version="1.1.14.768" />
   </ItemGroup>
   <ItemGroup>
     <None Include="default-config.json">
