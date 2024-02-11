@@ -37,9 +37,6 @@ namespace ShipLogSlideReelPlayer
 
         internal void LoadReelEntries(ShipLogManager shipLogManager)
         {
-            string text = "";
-            ShipLogManager log = Locator.GetShipLogManager();
-
             ReelEntries = new Dictionary<string, ReelShipLogEntry>();
             List<ReelShipLogEntry.Data> entriesData = ModHelper.Storage.Load<List<ReelShipLogEntry.Data>>("ReelEntries.json");
             SlideCollectionContainer[] existingReels = Resources.FindObjectsOfTypeAll<SlideCollectionContainer>();
@@ -59,43 +56,7 @@ namespace ShipLogSlideReelPlayer
                 }
                 ReelShipLogEntry entry = new ReelShipLogEntry(entryData, foundReels[0], shipLogManager);
                 ReelEntries.Add(entry.GetID(), entry);
-                if (entry.facts.Count == 0)
-                {
-                    text += $"{entry._name}|NONE\n";
-                }
-                foreach (var (fact, ints) in entry.facts)
-                {
-                    ShipLogFact sFact = log.GetFact(fact);
-                    bool play = ints.Remove(-2);
-                    bool fullRead = ints.Remove(-1);
-                    if (fullRead && ints.Count > 0)
-                    {
-                        throw new Exception("NOOOOO!");
-                    }
-                    if (!fullRead && ints.Count != 1)
-                    {
-                        throw new Exception("NOOOOO!");
-                    }
-                    text += $"{entry._name}|{GetEntryName(sFact._entryID, log)}|{sFact.GetText()}|{play}|{(fullRead ? "FULL" : ints[0])}|" +
-                            $"{sFact.IsRumor()}|{sFact.GetEntryRumorName()}|{(sFact.HasSource() ? GetEntryName(sFact.GetSourceID(), log) : "")}\n";
-                }
             }
-            
-            File.WriteAllText("C:\\Users\\dgarro\\Desktop\\entries.csv", text);
-
-        }
-
-        private string GetEntryName(String id, ShipLogManager log)
-        {
-            string name = "";
-            ShipLogEntry entry = log.GetEntry(id);
-            if (entry.HasParent())
-            {
-                name = log.GetEntry(entry.GetParentID()).GetName(false) + "/";
-            }
-
-            name += entry.GetName(false);
-            return name;
         }
 
         public void CreateMode()

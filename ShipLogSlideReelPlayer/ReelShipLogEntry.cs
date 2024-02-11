@@ -12,7 +12,7 @@ namespace ShipLogSlideReelPlayer
         private SlideCollectionContainer _reel;
         private bool _isVision;
         private string _id;
-        public string _name;
+        private string _name;
         private float _defaultSlideDuration;
         private List<string> _overridenByEntries;
         private bool _read;
@@ -46,60 +46,6 @@ namespace ShipLogSlideReelPlayer
             }
 
             InitState(reel._playWithShipLogFacts ?? Array.Empty<string>(), shipLogManager);
-            InitRelatedEntries(reel);
-        }
-
-        public Dictionary<string, List<int>> facts;
-        private void InitRelatedEntries(SlideCollectionContainer reel)
-        {
-            facts = new();
-            
-            reel.Initialize();
-            Slide[] slides = reel._slideCollection.slides;
-            for (int i = 0; i < slides.Length; i++)
-            {
-                SlideShipLogEntryModule module = slides[i].GetModule<SlideShipLogEntryModule>();
-                if (module != null)
-                {
-                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Adding FROM _entryKey="+module._entryKey);
-
-                    foreach (string fact in module._entryKey.Split(','))
-                    {
-                        ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Adding Fact="+fact);
-                        AddRelatedFact(facts, fact, i);
-                    }
-                }
-            }
-            ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Adding FROM _shipLogOnComplete="+reel._shipLogOnComplete);
-            if (!String.IsNullOrEmpty(reel._shipLogOnComplete))
-            {
-                foreach (string fact in reel._shipLogOnComplete.Split(','))
-                {
-                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Adding Fact="+fact);
-                    AddRelatedFact(facts, fact, -1);
-                }
-            }
-
-            if (reel._playWithShipLogFacts.Length > 0)
-            {
-                ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Adding FROM _playWithShipLogFacts="+String.Join(",", reel._playWithShipLogFacts));
-
-                foreach (string fact in reel._playWithShipLogFacts)
-                {
-                    ShipLogSlideReelPlayer.Instance.ModHelper.Console.WriteLine("Adding Fact="+fact);
-                    AddRelatedFact(facts, fact, -2);
-                }
-            }
-        }
-        
-        private static void AddRelatedFact(Dictionary<string, List<int>> facts, string fact, int i)
-        {
-            if (!facts.ContainsKey(fact))
-            {
-                facts.Add(fact, new List<int>());
-            }
-
-            facts[fact].Add(i);
         }
 
         private void InitState(string[] playWithShipLogFacts, ShipLogManager shipLogManager)
