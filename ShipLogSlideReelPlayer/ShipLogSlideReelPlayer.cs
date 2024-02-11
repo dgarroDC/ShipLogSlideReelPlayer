@@ -82,6 +82,41 @@ namespace ShipLogSlideReelPlayer
             }
             
             File.WriteAllText("C:\\Users\\dgarro\\Desktop\\entries.csv", text);
+            
+            foreach (ShipLogEntry shipLogEntry in Locator.GetShipLogManager()._entryList)
+            {
+                List<ShipLogFact> facts = new();
+                facts.AddRange(shipLogEntry._exploreFacts);
+                facts.AddRange(shipLogEntry._rumorFacts);
+                foreach (ShipLogFact shipLogFact in facts)
+                {
+                    string f1 = shipLogFact._text;
+                    string f2 = shipLogFact.GetText();
+                    if (f1 != f2)
+                    {
+                        ModHelper.Console.WriteLine("DIFF FACT: " + shipLogFact.GetID());
+                        ModHelper.Console.WriteLine("DIFF FACT 1: " + f1);
+                        ModHelper.Console.WriteLine("DIFF FACT 2: " + f2);
+                    }    
+                    string r1 = shipLogFact._entryRumorName;
+                    string r2 = shipLogFact.GetEntryRumorName();
+                    if (r1 != r2)
+                    {
+                        ModHelper.Console.WriteLine("DIFF RUMOR: " + shipLogFact.GetID());
+                        ModHelper.Console.WriteLine("DIFF RUMOR 1: " + r1);
+                        ModHelper.Console.WriteLine("DIFF RUMOR 2: " + r2);
+                    }
+                }
+
+                string n1 = shipLogEntry._name;
+                string n2 = shipLogEntry.GetName(false);
+                if (n1 != n2)
+                {
+                    ModHelper.Console.WriteLine("DIFF ENTRY: " + shipLogEntry.GetID());
+                    ModHelper.Console.WriteLine("DIFF ENTRY 1: " + n1);
+                    ModHelper.Console.WriteLine("DIFF ENTRY 2: " + n2);
+                }
+            }
 
         }
 
