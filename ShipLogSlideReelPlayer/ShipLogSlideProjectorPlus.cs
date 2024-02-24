@@ -27,14 +27,14 @@ namespace ShipLogSlideReelPlayer
         private Material _originalPhotoMaterial;
         private Material _invertPhotoMaterial;
 
-        public ShipLogSlideProjectorPlus(Image photo, ScreenPromptList promptList)
+        public ShipLogSlideProjectorPlus(Image photo, ScreenPromptList promptList, bool switchPrompts)
         {
             // TODO: Can I use  texture = collection[this._slideIndex]._image;? What is image? Or _firstSlideStandIn???
             _photo = photo;
             _originalPhotoMaterial = _photo.material;
             _invertPhotoMaterial = new Material(ShipLogSlideReelPlayer.Instance.evilShader);
 
-            _promptListSwitcher = new ScreenPromptListSwitcher(promptList);
+            _promptListSwitcher = new ScreenPromptListSwitcher(promptList, switchPrompts);
             // TODO: Translation
             _fullScreenPrompt = new ScreenPrompt(InputLibrary.map, "Fullscreen");
             _playPrompt = new ScreenPrompt(InputLibrary.markEntryOnHUD, "");

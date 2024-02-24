@@ -2,14 +2,11 @@
 using OWML.Common;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using System.IO;
-using System;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using ShipLogSlideReelPlayer.CustomShipLogModes;
-using UnityEngine.UI;
+using ShipLogSlideReelPlayer.CustomModesAPIs;
+using SuitLog.API;
 
 namespace ShipLogSlideReelPlayer
 {
@@ -62,13 +59,24 @@ namespace ShipLogSlideReelPlayer
         public void CreateMode()
         {
             ICustomShipLogModesAPI customShipLogModesAPI = ModHelper.Interaction.TryGetModApi<ICustomShipLogModesAPI>("dgarro.CustomShipLogModes");
-            
             customShipLogModesAPI.ItemListMake(true, true, itemList =>
             {
                 SlideReelPlayerMode reelPlayerMode = itemList.gameObject.AddComponent<SlideReelPlayerMode>();
-                reelPlayerMode.itemList = new ItemListWrapper(customShipLogModesAPI, itemList); 
+                reelPlayerMode.itemList = new ShipLogItemListWrapper(customShipLogModesAPI, itemList); 
                 reelPlayerMode.gameObject.name = nameof(SlideReelPlayerMode);
                 customShipLogModesAPI.AddMode(reelPlayerMode, () => true, () => SlideReelPlayerMode.Name);
+            });
+            
+            // Optional:
+            ISuitLogAPI suitLogAPI = ModHelper.Interaction.TryGetModApi<ISuitLogAPI>("dgarro.SuitLog");
+            suitLogAPI?.ItemListMake(itemList =>
+            {
+                SlideReelPlayerMode reelPlayerMode = itemList.gameObject.AddComponent<SlideReelPlayerMode>();
+                SuitLogItemListWrapper wrapper = new SuitLogItemListWrapper(suitLogAPI, itemList);
+                wrapper.DescriptionFieldOpen(); // Always keep this open!
+                reelPlayerMode.itemList = wrapper; 
+                reelPlayerMode.gameObject.name = nameof(SlideReelPlayerMode);
+                suitLogAPI.AddMode(reelPlayerMode, () => true, () => SlideReelPlayerMode.Name);
             });
         }
 

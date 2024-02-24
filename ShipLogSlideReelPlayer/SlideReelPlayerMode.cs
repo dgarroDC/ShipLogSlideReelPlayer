@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ShipLogSlideReelPlayer.CustomShipLogModes;
-using UnityEngine.UI;
+using ShipLogSlideReelPlayer.CustomModesAPIs;
 
 namespace ShipLogSlideReelPlayer;
 
@@ -28,7 +27,7 @@ public class SlideReelPlayerMode : ShipLogMode
 
         itemList.GetQuestionMark().text = ShipLogSlideReelPlayer.WithGreenColor("?");
         
-        _reelProjector = new ShipLogSlideProjectorPlus(itemList.GetPhoto(), _upperRightPromptList);
+        _reelProjector = new ShipLogSlideProjectorPlus(itemList.GetPhoto(), _upperRightPromptList, itemList is ShipLogItemListWrapper);
     }
 
     public override void EnterMode(string entryID = "", List<ShipLogFact> revealQueue = null)

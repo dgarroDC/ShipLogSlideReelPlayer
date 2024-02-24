@@ -13,6 +13,7 @@ public class FullScreenProjectionCanvas
         _canvasGo = new GameObject("ShipLogSlideReelPlayerFullScreenProjectionCanvas", typeof(Canvas), typeof(Image));
         Canvas canvas = _canvasGo.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 100; // This should be over the prompts (important for Suit Log)
         Image image = _canvasGo.GetComponent<Image>();
         image.color = Color.black;
 

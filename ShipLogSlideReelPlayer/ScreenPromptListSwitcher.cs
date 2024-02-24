@@ -9,35 +9,45 @@ public class ScreenPromptListSwitcher
 
     private ScreenPromptList _originalPromptList;
     private ScreenPromptList _newPromptList;
+    private RectTransform _originalPromptListRect;
+    private RectTransform _newPromptListRect;
     private PromptManager _promptManager;
+    private readonly bool _switchPrompts;
 
-
-    public ScreenPromptListSwitcher(ScreenPromptList originalPromptList)
+    public ScreenPromptListSwitcher(ScreenPromptList originalPromptList, bool switchPrompts)
     {
-        _originalPromptList = originalPromptList;
-        Transform promptListTransform = originalPromptList.transform;
-
-        // Copy prompt list
-        _newPromptList = Object.Instantiate(originalPromptList, promptListTransform.position, promptListTransform.rotation, promptListTransform.parent);
-        _newPromptList.transform.DestroyAllChildrenImmediate();
-        _newPromptList.SetReversePromptOrder(originalPromptList._reverse);
-        // This is probably not needed, UI size setter is already copied and should handle this, assuming the prompt list from Custom Ship Log Modes has it...
-        _newPromptList.SetMinElementDimensionsAndFontSize(originalPromptList._promptElementMinHeight, originalPromptList._promptElementMinWidth, originalPromptList._listFontSize);
-        
         _promptManager = Locator.GetPromptManager();
 
-        Hide(_newPromptList);
+        _originalPromptList = originalPromptList;
+        _originalPromptListRect = _originalPromptList.GetComponent<RectTransform>();
+
+        _switchPrompts = switchPrompts;
+        if (switchPrompts)
+        {
+            // Copy prompt list
+            _newPromptList = Object.Instantiate(originalPromptList, _originalPromptListRect.position, _originalPromptListRect.rotation, _originalPromptListRect.parent);
+            _newPromptListRect = _newPromptList.GetComponent<RectTransform>();
+            _newPromptListRect.DestroyAllChildrenImmediate();
+            _newPromptList.SetReversePromptOrder(originalPromptList._reverse);
+            // This is probably not needed, UI size setter is already copied and should handle this, assuming the prompt list from Custom Ship Log Modes has it...
+            _newPromptList.SetMinElementDimensionsAndFontSize(originalPromptList._promptElementMinHeight, originalPromptList._promptElementMinWidth, originalPromptList._listFontSize);
+
+            Hide(_newPromptList);
+        }
     }
 
     public void Reset()
     {
-        Show(_originalPromptList);
-        Hide(_newPromptList);
+        if (_switchPrompts)
+        {
+            Show(_originalPromptList);
+            Hide(_newPromptList);
+        }
     }
 
     public void AddScreenPrompt(ScreenPrompt buttonPrompt)
     {
-        _promptManager.AddScreenPrompt(buttonPrompt, _newPromptList, TextAnchor.MiddleRight);
+        _promptManager.AddScreenPrompt(buttonPrompt, _switchPrompts? _newPromptList : _originalPromptList, TextAnchor.MiddleRight);
     }
 
     public void RemoveScreenPrompt(ScreenPrompt buttonPrompt)
@@ -47,7 +57,7 @@ public class ScreenPromptListSwitcher
 
     public void Update()
     {
-        if (Time.unscaledTime >= _lastSwitchTime + SwitchTime)
+        if (_switchPrompts && Time.unscaledTime >= _lastSwitchTime + SwitchTime)
         {
             _lastSwitchTime = Time.unscaledTime;
             // Use scale because active mess up with children somehow, they could remain invisible
@@ -62,6 +72,7 @@ public class ScreenPromptListSwitcher
                 Hide(_newPromptList);
             }
         }
+        //     ALSO TEST "?"
     }
 
     private void Hide(ScreenPromptList promptList)
