@@ -14,7 +14,8 @@ The game already displays them when regular entries are selected in the vanilla 
 * Music is also reproduced!
 * All reels and visions are displayed.* The vanilla player lacks some because it only shows the ones that have Ship Log facts about them, but there are a couple that aren't mentioned in the logs (and there's also an special one that actually appears in the logs but it isn't displayed, probably because another reason that I don't want to spoil). Not only that, some of them are only associated with rumor facts, and we you explore its entry then you wouldn't be able to play it on the Ship Log anymore (except in some cases where they are playable in the arrows of the Rumor Mode).
 * There's an indicator of the current slide and how many slides there are for the selected reel (using a text bar and numbers). 
-* *More to come!*
+* Integration with [Suit Log](https://outerwildsmods.com/mods/suitlog/): If you have that mod installed, then the Slide Reel Player mode will be also added to the Suit Log, allowing you to watch all the reels anywhere including all the features that are in the Ship Log mode!
+* *More to come?*
 
 *Because some reels/visions aren't tracked by Ship Log facts, the mod doesn't have a way of knowing if you actually watched them before installing it. So, in order to include those specific reels/visions in the Slide Reel Player Mode, you would have to watch them again while the mod is installed (this is persisted on your save file, next time you boot the game the mod will remember it!).
 
