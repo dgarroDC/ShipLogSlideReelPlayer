@@ -67,7 +67,7 @@ namespace ShipLogSlideReelPlayer
                 customShipLogModesAPI.AddMode(reelPlayerMode, () => true, () => SlideReelPlayerMode.Name);
             });
             
-            // Optional:
+            // Optional Suit Log dependency, so use the ? operator:
             ISuitLogAPI suitLogAPI = ModHelper.Interaction.TryGetModApi<ISuitLogAPI>("dgarro.SuitLog");
             suitLogAPI?.ItemListMake(itemList =>
             {
