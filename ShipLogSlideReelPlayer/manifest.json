@@ -4,6 +4,6 @@
     "name": "Ship Log Slide Reel Player Plus",
     "uniqueName": "dgarro.ShipLogSlideReelPlayer",
     "version": "2.4.0",
-    "owmlVersion": "2.7.2",
+    "owmlVersion": "2.13.0",
     "dependencies": [ "dgarro.CustomShipLogModes" ]
 }
