@@ -59,7 +59,7 @@ namespace ShipLogSlideReelPlayer
         public void CreateMode()
         {
             ICustomShipLogModesAPI customShipLogModesAPI = ModHelper.Interaction.TryGetModApi<ICustomShipLogModesAPI>("dgarro.CustomShipLogModes");
-            customShipLogModesAPI.ItemListMake(true, true, itemList =>
+            customShipLogModesAPI.ItemListMake(false, false, itemList =>
             {
                 SlideReelPlayerMode reelPlayerMode = itemList.gameObject.AddComponent<SlideReelPlayerMode>();
                 reelPlayerMode.itemList = new ShipLogItemListWrapper(customShipLogModesAPI, itemList); 
