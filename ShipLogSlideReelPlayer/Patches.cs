@@ -9,8 +9,7 @@ namespace ShipLogSlideReelPlayer
         [HarmonyPatch(typeof(ShipLogManager), nameof(ShipLogManager.Awake))]
         private static void ShipLogManager_Awake(ShipLogManager __instance)
         {
-            // TODO: Why here?
-            ShipLogSlideReelPlayer.Instance.LoadReelEntries(__instance);
+            ShipLogSlideReelPlayer.Instance.shipLogManager = __instance;
             ShipLogSlideReelPlayer.Instance.CreateMode();
         }
 
@@ -20,12 +19,19 @@ namespace ShipLogSlideReelPlayer
         {
             ShipLogSlideReelPlayer.Instance.UnloadAllTextures();
         }
+        
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(SlideCollectionContainer), nameof(SlideCollectionContainer.Initialize))]
+        private static void SlideCollectionContainer_Initialize(SlideCollectionContainer __instance)
+        {
+            ShipLogSlideReelPlayer.Instance.RegisterReel(__instance);
+        }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SlideCollectionContainer), nameof(SlideCollectionContainer.SetReadFlag))]
         private static void SlideCollectionContainer_SetReadFlag(SlideCollectionContainer __instance)
         {
-            bool isReelEntry = ShipLogSlideReelPlayer.Instance.ReelEntries.TryGetValue(__instance.name, out ReelShipLogEntry entry);
+            bool isReelEntry = ShipLogSlideReelPlayer.Instance.ReelEntries.TryGetValue(__instance, out ReelShipLogEntry entry);
             if (isReelEntry)
             {
                 entry.CheckRead(__instance);

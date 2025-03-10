@@ -38,6 +38,7 @@ public class SlideReelPlayerMode : ShipLogMode
 
         _reels = ShipLogSlideReelPlayer.Instance.ReelEntries.Values
             .Where(re => re.ShouldShow())
+            .OrderBy(re => re.GetIndex())
             .ToArray();
 
         List<Tuple<string, bool, bool, bool>> items = new();

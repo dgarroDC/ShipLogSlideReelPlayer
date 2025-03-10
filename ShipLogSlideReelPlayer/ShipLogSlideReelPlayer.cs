@@ -1,8 +1,8 @@
-﻿using OWML.ModHelper;
+﻿using System;
+using OWML.ModHelper;
 using OWML.Common;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using ShipLogSlideReelPlayer.CustomModesAPIs;
@@ -14,10 +14,13 @@ namespace ShipLogSlideReelPlayer
     {
         public static ShipLogSlideReelPlayer Instance;
 
-        public Dictionary<string, ReelShipLogEntry> ReelEntries;
+        public ShipLogManager shipLogManager;
+        public Dictionary<SlideCollectionContainer, ReelShipLogEntry> ReelEntries;
         public Shader evilShader;
 
         public bool showAll;
+        
+        private Dictionary<String, ReelShipLogEntry.Data> _pendingVanillaEntries;
 
         private void Start()
         {
@@ -25,6 +28,16 @@ namespace ShipLogSlideReelPlayer
             AssetBundle bundle = ModHelper.Assets.LoadBundle("Assets/evilshader");
             evilShader = bundle.LoadAsset<Shader>("Assets/dgarro/Evil.shader");
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+            
+            List<ReelShipLogEntry.Data> entriesData = ModHelper.Storage.Load<List<ReelShipLogEntry.Data>>("ReelEntries.json");
+            _pendingVanillaEntries = new Dictionary<string, ReelShipLogEntry.Data>();
+            for (var i = 0; i < entriesData.Count; i++)
+            {
+                ReelShipLogEntry.Data data = entriesData[i];
+                data.Index = i;
+                _pendingVanillaEntries.Add(data.ID, data);
+            }
+            ReelEntries = new Dictionary<SlideCollectionContainer, ReelShipLogEntry>();
         }
 
         public override void Configure(IModConfig config)
@@ -32,27 +45,48 @@ namespace ShipLogSlideReelPlayer
             showAll = config.GetSettingsValue<bool>("Show all reels (WARNING: SPOILERS)");
         }
 
-        internal void LoadReelEntries(ShipLogManager shipLogManager)
+        public void RegisterReel(SlideCollectionContainer reel)
         {
-            ReelEntries = new Dictionary<string, ReelShipLogEntry>();
-            List<ReelShipLogEntry.Data> entriesData = ModHelper.Storage.Load<List<ReelShipLogEntry.Data>>("ReelEntries.json");
-            SlideCollectionContainer[] existingReels = Resources.FindObjectsOfTypeAll<SlideCollectionContainer>();
-            foreach (ReelShipLogEntry.Data entryData in entriesData)
+            if (ReelEntries.ContainsKey(reel))
             {
-                string reelName = entryData.ID;
-                SlideCollectionContainer[] foundReels = existingReels.Where(reel => reel.name == reelName).ToArray();
-                if (foundReels.Length == 0)
-                {
-                    ModHelper.Console.WriteLine("Reel with name " + reelName + " not found!", MessageType.Error);
-                    continue;
-                }
-                if (foundReels.Length > 1)
-                {
-                    ModHelper.Console.WriteLine("Multiple (" + foundReels.Length + ") reels with name " + reelName + " found, defaulting to the first one...",
-                        MessageType.Error);
-                }
-                ReelShipLogEntry entry = new ReelShipLogEntry(entryData, foundReels[0], shipLogManager);
-                ReelEntries.Add(entry.GetID(), entry);
+                // Already registered, the initialization method could be call more than once
+                return;
+            }
+            // ReelEntries with key destroyed???
+            ReelShipLogEntry.Data entryData = null;
+            string reelName;
+            try
+            {
+                reelName = reel.name;
+            }
+            catch (Exception e)
+            {
+                ModHelper.Console.WriteLine("ERROR REGISTERING " + e);
+                ModHelper.Console.WriteLine("WITH REEL " + reel);
+                return;
+            }
+            ModHelper.Console.WriteLine("OK WITH REEL " + reelName);
+            if (_pendingVanillaEntries.ContainsKey(reelName))
+            {
+                entryData = _pendingVanillaEntries[reelName];
+                // NH vision torches contain duplicates of Story 4 and Story 5 visions (with same name), if active they will register here, leading to duplicates
+                // we could be registering one of the copies, but it should be the same as vanilla, right???
+                _pendingVanillaEntries.Remove(reelName);
+            }
+            else if (reel._playWithShipLogFacts?.Length > 0)
+            {
+                // Note that the list could be true on a first initialization call but then not (see TODO)
+                entryData = new ReelShipLogEntry.Data();
+                entryData.ID = null; // This is only used for vanilla?
+                entryData.Name = reelName; 
+                entryData.Index = Int32.MaxValue; // TODO: Add a way to order them???
+                // TODO: find out the real duration instead of default, although NH doesn't support setting it
+            }
+
+            if (entryData != null)
+            {
+                ReelShipLogEntry entry = new ReelShipLogEntry(entryData, reel);
+                ReelEntries.Add(reel, entry);
             }
         }
 

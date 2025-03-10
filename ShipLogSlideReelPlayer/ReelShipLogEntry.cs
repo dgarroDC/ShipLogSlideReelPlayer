@@ -14,25 +14,25 @@ namespace ShipLogSlideReelPlayer
         private string _id;
         private string _name;
         private float _defaultSlideDuration;
+        private int _index;
         private List<string> _overridenByEntries;
-        private bool _read;
+        private string[] _playWithShipLogFacts;
+        private Slide[] _originalSlides;
 
-        public ReelShipLogEntry(Data entryData, SlideCollectionContainer reel, ShipLogManager shipLogManager) 
+        public ReelShipLogEntry(Data entryData, SlideCollectionContainer reel)
         {
             _reel = CopySlideCollectionContainer(reel);
 
             _id = entryData.ID;
             _name = entryData.Name;
+            _index = entryData.Index;
 
-            string defaultSlideDurationForVision = entryData.Duration;
-            if (defaultSlideDurationForVision != null)
+            if (entryData.Duration != null)
             {
-                _isVision = true;
-                _defaultSlideDuration = float.Parse(defaultSlideDurationForVision, OWUtilities.owFormatProvider);
+                _defaultSlideDuration = float.Parse(entryData.Duration, OWUtilities.owFormatProvider);
             }
             else
             {
-                _isVision = false;
                 _defaultSlideDuration = 0.7f; // This is the default MindSlideCollection._defaultSlideDuration, seems ok I guess
             }
 
@@ -44,24 +44,6 @@ namespace ShipLogSlideReelPlayer
                     _overridenByEntries.Add(overridenByEntry);
                 }
             }
-
-            InitState(reel._playWithShipLogFacts ?? Array.Empty<string>(), shipLogManager);
-        }
-
-        private void InitState(string[] playWithShipLogFacts, ShipLogManager shipLogManager)
-        {
-            _read = false;
-            // The reel entries are created when a game is loaded, so it's ok to do this
-            if (PlayerData.GetPersistentCondition(GetReadCondition()))
-            {
-                _read = true;
-                return;
-            }
-
-            if (!playWithShipLogFacts.Any(factID => shipLogManager.IsFactRevealed(factID))) return;
-            _read = true;
-            // Save even the ones with playWithShipLogFacts not empty, just in case
-            PlayerData.SetPersistentCondition(GetReadCondition(), true);
         }
 
         private SlideCollectionContainer CopySlideCollectionContainer(SlideCollectionContainer original)
@@ -73,9 +55,9 @@ namespace ShipLogSlideReelPlayer
             copy._autoLoadStreaming = original._autoLoadStreaming;
             copy._invertBlackFrames = original._invertBlackFrames; // Probably unused
             copy._slideCollection = CopySlideCollection(original._slideCollection);
-            copy._playWithShipLogFacts = Array.Empty<string>(); 
-            // Leave copy._playWithShipLogFacts empty, so we don't call RegisterSlideCollection
-            // (ours doesn't have the _isVision field because I don't want to use _owningItem or patch SlideCollectionContainer.Initialize)
+            copy._playWithShipLogFacts = Array.Empty<string>();
+            _playWithShipLogFacts = original._playWithShipLogFacts;
+            // Leave copy._playWithShipLogFacts empty, so we don't call RegisterSlideCollection (or register the reel?)
 
             return copy;
         }
@@ -88,7 +70,14 @@ namespace ShipLogSlideReelPlayer
             {
                 copy.slides[i] = new Slide(original.slides[i]);
             }
+            // Keep this for NH, they use _image (unused in vanilla?) but are loaded asynchronously..
+            _originalSlides = original.slides;
+            // TODO: Remove this and the copy mechanism, use the original and more manual work loading like the vanilla ShipLogSlideProjector?
 
+            _isVision = original._isVision;
+            // Ours doesn't have the _isVision field correctly because I don't want to use _owningItem or patch SlideCollectionContainer.Initialize for this
+
+            
             return copy;
         }
 
@@ -99,6 +88,7 @@ namespace ShipLogSlideReelPlayer
 
         public void LoadStreamingTextures()
         {
+            RefreshSlideImages();
             _reel.Initialize();
             if (_reel.streamingTexturesAvailable)
             {
@@ -106,6 +96,15 @@ namespace ShipLogSlideReelPlayer
                 _reel.LoadStreamingTextures();
             }
         }
+
+        private void RefreshSlideImages()
+        {
+            for (var i = 0; i < _originalSlides.Length; i++)
+            {
+                _reel._slideCollection.slides[i]._image = _originalSlides[i]._image;
+            }
+        }
+
         public void UnloadStreamingTextures()
         {
             if (_reel._initialized && _reel.streamingTexturesAvailable)
@@ -122,7 +121,12 @@ namespace ShipLogSlideReelPlayer
 
         public void CheckRead(SlideCollectionContainer realReel)
         {
-            if (_read)
+            // Save the read state for entries without facts
+            if (_playWithShipLogFacts.Length > 0)
+            {
+                return;
+            }
+            if (PlayerData.GetPersistentCondition(GetReadCondition()))
             {
                 return;
             }
@@ -135,19 +139,18 @@ namespace ShipLogSlideReelPlayer
                 }
             }
 
-            _read = true;
             PlayerData.SetPersistentCondition(GetReadCondition(), true);
-        }
-
-        public string GetID()
-        {
-            return _id;
         }
 
         public string GetName()
         {
             // Color is added here to make it easier to Suit Log (not anymore tho)
             return ShipLogSlideReelPlayer.WithGreenColor(_name);
+        }
+ 
+        public int GetIndex()
+        {
+            return _index;
         }
 
         public bool HasMoreToExplore()
@@ -163,13 +166,25 @@ namespace ShipLogSlideReelPlayer
             }
             foreach (string overridenByEntry in _overridenByEntries)
             {
-                if (ShipLogSlideReelPlayer.Instance.ReelEntries.GetValueOrDefault(overridenByEntry)._read)
+                if (ShipLogSlideReelPlayer.Instance.ReelEntries.Values.Any(reel => overridenByEntry.Equals(reel._id) && reel.IsRead()))
                 {
                     // TODO: Test this case
                     return false;
                 }
             }
-            return _read;
+
+            return IsRead();
+        }
+
+        private bool IsRead()
+        {
+            if (_playWithShipLogFacts.Length > 0)
+            {
+                return _playWithShipLogFacts.Any(factID => 
+                    ShipLogSlideReelPlayer.Instance.shipLogManager.IsFactRevealed(factID));
+            }
+
+            return PlayerData.GetPersistentCondition(GetReadCondition());
         }
 
         private string GetReadCondition()
@@ -183,6 +198,7 @@ namespace ShipLogSlideReelPlayer
             public string Name;
             public List<string> Overriden;
             public string Duration;
+            public int Index;
         }
     }
 }
